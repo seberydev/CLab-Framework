@@ -18,13 +18,22 @@ protected:
 	}
 
 	void OnRender() override {
-		Clear::Blue();
+		Clear(Color::POMEGRANATE);
 	}
 
 	void OnFinish() override {
 	
 	}
 };
+
+/*
+	TODO:
+	Draw Shapes (Outlined and Filled):
+	-Triangle
+	-Square
+	-Rectangle
+	-Circle
+*/
 
 int main(int argc, char *args[]) {
 	Game game;

@@ -21,7 +21,7 @@
     <ClCompile Include="libs\CLF\CLF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libs\CLF\interfaces\Clear.cpp">
+    <ClCompile Include="libs\CLF\interfaces\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClInclude Include="libs\CLF\Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libs\CLF\interfaces\Clear.h">
+    <ClInclude Include="libs\CLF\interfaces\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

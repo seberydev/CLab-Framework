@@ -77,3 +77,8 @@ void CLF::CalcDeltaTime() {
 
 	ticksLastFrame = SDL_GetTicks();
 }
+
+void CLF::Clear(const Color& color) {
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderClear(renderer);
+}
