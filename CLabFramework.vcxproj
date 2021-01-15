@@ -163,14 +163,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="libs\CLF\CLF.cpp" />
-    <ClCompile Include="libs\CLF\interfaces\Color.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\CLF\CLF.h" />
-    <ClInclude Include="libs\CLF\Data.h" />
     <ClInclude Include="libs\CLF\interfaces\Color.h" />
+    <ClInclude Include="libs\CLF\interfaces\Primitive.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

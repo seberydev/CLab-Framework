@@ -1,8 +1,8 @@
 #include <CLF/CLF.h>
 
-class Game : public CLF {
+class Game : public clf::Engine {
 public:
-	Game() : CLF() { };
+	Game() = default;
 	virtual ~Game() = default;
 protected:
 	void OnStart() override {
@@ -18,26 +18,21 @@ protected:
 	}
 
 	void OnRender() override {
-		Clear(Color::POMEGRANATE);
+		Clear(clf::Color::PORTAFINO);
+		DrawTriangle(100, 400, 200, 200, 300, 400, clf::Color::METALLIC_BRONZE);
+		DrawSquare(200, 10, 50, clf::Color::METALLIC_BRONZE);
+		DrawRectangle(400, 400, 150, 50, clf::Color::METALLIC_BRONZE);
+		DrawCircle(100.0, 100.0, 20.0, clf::Color::METALLIC_BRONZE);
 	}
 
 	void OnFinish() override {
-	
+		
 	}
 };
 
-/*
-	TODO:
-	Draw Shapes (Outlined and Filled):
-	-Triangle
-	-Square
-	-Rectangle
-	-Circle
-*/
-
 int main(int argc, char *args[]) {
 	Game game;
-	if (game.Initialize("Game", 480, 320))
+	if (game.Initialize("Game", 600, 600))
 		game.Build();
 	else
 		return -1;
