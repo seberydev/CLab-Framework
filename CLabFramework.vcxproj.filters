@@ -18,12 +18,6 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libs\CLF\interfaces\Color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\CLF\interfaces\Primitive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\CLF\CLF.h">
@@ -35,5 +29,13 @@
     <ClInclude Include="libs\CLF\interfaces\Primitive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\character.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\character.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
