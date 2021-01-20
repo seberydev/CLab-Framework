@@ -20,13 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libs\CLF\CLF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\CLF\interfaces\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libs\CLF\interfaces\Primitive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\clf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

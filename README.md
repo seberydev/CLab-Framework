@@ -1,2 +1,2 @@
 # CLab-Framework
-A single header file framework made with C++ and SDL2 to make games easily!
+A Single Header File Framework made with SDL2 and C++ to work easily!

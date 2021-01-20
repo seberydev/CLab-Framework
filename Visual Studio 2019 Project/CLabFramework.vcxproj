@@ -166,7 +166,7 @@
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libs\CLF\CLF.h" />
+    <ClInclude Include="libs\clf.h" />
     <ClInclude Include="libs\CLF\interfaces\Color.h" />
     <ClInclude Include="libs\CLF\interfaces\Primitive.h" />
   </ItemGroup>
