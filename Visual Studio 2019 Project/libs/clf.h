@@ -8,6 +8,7 @@
 //STL Includes
 #include <string>
 #include <assert.h>
+#include <iostream>
 
 namespace clf {
 	// ----------------------------------------------------------------
@@ -114,14 +115,45 @@ namespace clf {
 	}
 
 	// ----------------------------------------------------------------
+	// - Info Specification                                           -
+	// ----------------------------------------------------------------
+	class Info {
+	private:
+		Info() = default;
+		~Info() = default;
+	public:
+		static int GetTextureWidth(SDL_Texture* texture);
+		static int GetTextureHeight(SDL_Texture* texture);
+	};
+
+	// ----------------------------------------------------------------
+	// - Info Implementation                                          -
+	// ----------------------------------------------------------------
+	int Info::GetTextureWidth(SDL_Texture* texture) {
+		int width{ 0 };
+		SDL_QueryTexture(texture, NULL, NULL, &width, nullptr);
+
+		return width;
+	}
+
+	int Info::GetTextureHeight(SDL_Texture* texture) {
+		int height{ 0 };
+		SDL_QueryTexture(texture, NULL, NULL, nullptr, &height);
+
+		return height;
+	}
+
+	// ----------------------------------------------------------------
 	// - Asset Specification                                          -
 	// ----------------------------------------------------------------
 	class Asset {
-	public:
-		Asset() = delete;
-		~Asset() = delete;
+	private:
+		Asset() = default;
+		~Asset() = default;
 	public:
 		static SDL_Texture* LoadPNG(const std::string& filepath);
+		static SDL_Texture* LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
+		static SDL_Texture* ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 	};
 
 	// ----------------------------------------------------------------
@@ -143,37 +175,42 @@ namespace clf {
 		return texture;
 	}
 
-	// ----------------------------------------------------------------
-	// - Sprite Specification		                                  -
-	// ----------------------------------------------------------------
-	struct Sprite {
-	public:
-		Sprite(const SDL_Rect& source, const SDL_Rect& destination);
-		~Sprite() = default;
-	public:
-		SDL_Rect src;
-		SDL_Rect dst;
-	};
+	SDL_Texture* Asset::LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline) {
+		TTF_Font* font{ TTF_OpenFont(filepath.c_str(), size) };
+		TTF_SetFontOutline(font, outline);
+		SDL_Surface* temp{ TTF_RenderText_Blended(font, text.c_str(), color) };
+		SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::renderer, temp) };
+		
+		assert(texture);
+		
+		SDL_FreeSurface(temp);
+		temp = nullptr;
+		TTF_CloseFont(font);
+		font = nullptr;
 
-	// ----------------------------------------------------------------
-	// - Sprite Implementation		                                  -
-	// ----------------------------------------------------------------
-	Sprite::Sprite(const SDL_Rect& source, const SDL_Rect& destination)
-		: src{ source }, dst{ destination } {}
+		return texture;
+	}
+
+	SDL_Texture* Asset::ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline) {
+		SDL_DestroyTexture(texture);
+		return LoadText(filepath, size, text, color, outline);
+	}
 
 	// ----------------------------------------------------------------
 	// - Draw Specification		                                      -
 	// ----------------------------------------------------------------
 	class Draw {
-	public:
-		Draw() = delete;
-		~Draw() = delete;
+	private:
+		Draw() = default;
+		~Draw() = default;
 	public:
 		static void Clear(const SDL_Color& color);
-		static void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, const SDL_Color& color);
+		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
+		static void DrawFillRect(const SDL_Rect& destination, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& destination, const SDL_Color& color);
-		static void DrawCircle(double x, double y, double radius, const SDL_Color& color);
-		static void DrawSprite(SDL_Texture* texture, Sprite& sprite);
+		static void DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color);
+		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
+		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);
 	};
 
 	// ----------------------------------------------------------------
@@ -184,40 +221,43 @@ namespace clf {
 		SDL_RenderClear(clf::Engine::renderer);
 	}
 
+	void Draw::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
+		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
+		SDL_RenderFillRect(clf::Engine::renderer, &destination);
+	}
+
 	void Draw::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawCircle(double x, double y, double radius, const SDL_Color& color) {
+	void Draw::DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color) {
 		const double PI = 3.1415926535;
 		double x1{ 0.0 }, y1{ 0.0 };
-
+		
 		for (double angle{ 0.0 }; angle < 360.0; angle += 0.1) {
 			x1 = radius * cos(angle * PI / 180.0);
 			y1 = radius * sin(angle * PI / 180.0);
 
 			SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(x + x1), static_cast<float>(y + y1));
+			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(point.x + x1), static_cast<float>(point.y + y1));
 		}
 	}
 
-	void Draw::DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, const SDL_Color& color) {
-		SDL_Point points[4] = {
-			{x1, y1},
-			{x2, y2},
-			{x3, y3},
-			{x1, y1}
-		};
+	void Draw::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
+		SDL_Point vertices[4] = {v1, v2, v3, v1};
 
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-		SDL_RenderDrawLines(clf::Engine::renderer, points, 4);
+		SDL_RenderDrawLines(clf::Engine::renderer, vertices, 4);
 	}
 
-	void Draw::DrawSprite(SDL_Texture* texture, Sprite& sprite) {
-		SDL_RenderCopy(clf::Engine::renderer, texture, &sprite.src, &sprite.dst);
+	void Draw::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
+		SDL_RenderCopy(clf::Engine::renderer, texture, &source, &destination);
 	}
 
+	void Draw::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
+		SDL_RenderCopy(clf::Engine::renderer, texture, nullptr, &destination);
+	}
 
 }
 

@@ -38,4 +38,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\pico.ttf" />
+  </ItemGroup>
 </Project>
