@@ -12,11 +12,19 @@ public:
 	SDL_Color messageColor{ 255, 255, 255, 255 };
 	SDL_Rect messageDST;
 	int counter{0};
+	Mix_Music* mainSound{ nullptr };
+	Mix_Music* secondSound{ nullptr };
 protected:
 	void OnStart() override {
-		characterTexture = clf::Asset::LoadPNG("assets/character.png");
+		characterTexture = clf::Asset::LoadSprite("assets/character.png");
 		message = clf::Asset::LoadText("assets/pico.ttf", 14, "The Best Game", messageColor, 0);
 		messageDST = { 20, 20, clf::Info::GetTextureWidth(message), clf::Info::GetTextureHeight(message) };
+		mainSound = clf::Asset::LoadMusic("assets/sound.ogg");
+		secondSound = clf::Asset::LoadMusic("assets/shoot.wav");
+		clf::Sound::SetMusicVolume(100);
+		clf::Sound::PlayFadeInMusic(mainSound, true, 0, 5000);
+
+		std::cout << clf::Sound::GetMusicVolume() << "\n";
 	}
 
 	void OnInput(const Uint8* keystates) override {
@@ -29,6 +37,24 @@ protected:
 		else if(keystates[SDL_SCANCODE_D]) 
 			characterDST.x += 1;
 
+		if (keystates[SDL_SCANCODE_P]) 
+			clf::Sound::PauseMusic();
+		
+		if (keystates[SDL_SCANCODE_R]) 
+			clf::Sound::ResumeMusic();
+
+		if (keystates[SDL_SCANCODE_C])
+			clf::Sound::ChangeMusic(secondSound, false, 2);
+
+		if (keystates[SDL_SCANCODE_F])
+			clf::Sound::FadeOutMusic(5000);
+
+		if (keystates[SDL_SCANCODE_Z])
+			clf::Sound::ChangeFadeOutMusic(secondSound, false, 3, 3000);
+
+		if (keystates[SDL_SCANCODE_O])
+			clf::Sound::ChangeFadeOutFadeInMusic(secondSound, false, 3, 1000, 3000);
+		
 		if (keystates[SDL_SCANCODE_SPACE]) {
 			++counter;
 			message = clf::Asset::ChangeText(message, "assets/pico.ttf", 16, std::to_string(counter), messageColor, 1);
@@ -37,7 +63,7 @@ protected:
 	}
 
 	void OnUpdate(float deltaTime) override {
-	
+		
 	}
 
 	void OnRender() override {
@@ -50,14 +76,16 @@ protected:
 	}
 
 	void OnFinish() override {
-		SDL_DestroyTexture(characterTexture);
-		SDL_DestroyTexture(message);
+		clf::Asset::FreeTexture(characterTexture);
+		clf::Asset::FreeTexture(message);
+		clf::Asset::FreeMusic(mainSound);
+		clf::Asset::FreeMusic(secondSound);
 	}
 };
 
 int main(int argc, char *args[]) {
 	Game game;
-	game.Build("Game", 600, 600);
+	game.Build("Game", 600, 600, SDL_INIT_EVERYTHING, SDL_WINDOW_SHOWN);
 
 	return 0;
 }

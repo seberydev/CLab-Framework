@@ -41,4 +41,12 @@
   <ItemGroup>
     <Font Include="assets\pico.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\sound.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\shoot.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
 </Project>

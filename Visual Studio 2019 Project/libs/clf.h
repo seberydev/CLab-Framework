@@ -19,7 +19,7 @@ namespace clf {
 		Engine() = default;
 		virtual ~Engine() = default;
 	public:
-		void Build(const std::string& title, int screen_width, int screen_height);
+		void Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		static SDL_Renderer* renderer;
 	protected:
 		virtual void OnStart() = 0;
@@ -28,7 +28,7 @@ namespace clf {
 		virtual void OnRender() = 0;
 		virtual void OnFinish() = 0;
 	private:
-		bool Initialize(const std::string& title, int screen_width, int screen_height);
+		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		void CalcDeltaTime();
 		const int FPS{ 60 };
 		const int FRAME_TARGET{ 1000 / FPS };
@@ -45,8 +45,9 @@ namespace clf {
 	// ----------------------------------------------------------------
 	SDL_Renderer* Engine::renderer{nullptr};
 
-	void Engine::Build(const std::string& title, int screen_width, int screen_height) {
-		assert(Initialize(title, screen_width, screen_height));
+	//The core engine methods and structure
+	void Engine::Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags) {
+		assert(Initialize(title, screen_width, screen_height, subsystemFlags, windowFlags));
 
 		OnStart();
 
@@ -69,6 +70,13 @@ namespace clf {
 
 		OnFinish();
 
+		//Unloads the SDL_Mixer library
+		Mix_HaltMusic();
+		Mix_CloseAudio();
+		while (Mix_Init(0))
+			Mix_Quit();
+
+		//Unloads all SDL libraries
 		IMG_Quit();
 		TTF_Quit();
 		SDL_DestroyRenderer(renderer);
@@ -78,9 +86,12 @@ namespace clf {
 		SDL_Quit();
 	}
 
-	bool Engine::Initialize(const std::string& title, int screen_width, int screen_height) {
-		if (SDL_Init(SDL_INIT_EVERYTHING) < 0 || !IMG_Init(IMG_INIT_PNG) || TTF_Init() == -1)
+	//Creates the window and renderer
+	bool Engine::Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags) {
+		if (SDL_Init(subsystemFlags) < 0 || !IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) || TTF_Init() == -1 || !Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG))
 			return false;
+
+		assert(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) != -1);
 
 		window = SDL_CreateWindow(
 			title.c_str(),
@@ -88,7 +99,7 @@ namespace clf {
 			SDL_WINDOWPOS_CENTERED,
 			screen_width,
 			screen_height,
-			SDL_WINDOW_SHOWN);
+			windowFlags);
 
 		if (!window)
 			return false;
@@ -117,6 +128,7 @@ namespace clf {
 	// ----------------------------------------------------------------
 	// - Info Specification                                           -
 	// ----------------------------------------------------------------
+	//Useful info about SDL classes
 	class Info {
 	private:
 		Info() = default;
@@ -151,18 +163,22 @@ namespace clf {
 		Asset() = default;
 		~Asset() = default;
 	public:
-		static SDL_Texture* LoadPNG(const std::string& filepath);
+		static SDL_Texture* LoadSprite(const std::string& filepath);
 		static SDL_Texture* LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 		static SDL_Texture* ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
+		static Mix_Music* LoadMusic(const std::string& filepath);
+		static Mix_Chunk* LoadSoundEffect(const std::string& filepath);
+		static void FreeTexture(SDL_Texture* texture);
+		static void FreeMusic(Mix_Music* music);
 	};
 
 	// ----------------------------------------------------------------
 	// - Asset Implementation                                         -
 	// ----------------------------------------------------------------
-	SDL_Texture* Asset::LoadPNG(const std::string& filepath) {
-		//Fails if the asset is not png
+	SDL_Texture* Asset::LoadSprite(const std::string& filepath) {
+		//Fails if the asset is not PNG or JPG
 		SDL_RWops* rwop{ SDL_RWFromFile(filepath.c_str(), "rb") };
-		assert(IMG_isPNG(rwop));
+		assert(IMG_isPNG(rwop) || IMG_isJPG(rwop));
 
 		SDL_Surface* temp{ IMG_Load(filepath.c_str()) };
 		SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::renderer, temp) };
@@ -194,6 +210,30 @@ namespace clf {
 	SDL_Texture* Asset::ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline) {
 		SDL_DestroyTexture(texture);
 		return LoadText(filepath, size, text, color, outline);
+	}
+
+	Mix_Music* Asset::LoadMusic(const std::string& filepath) {
+		Mix_Music* sound{ Mix_LoadMUS(filepath.c_str()) };
+		assert(sound);
+		return sound;
+	}
+
+	Mix_Chunk* Asset::LoadSoundEffect(const std::string& filepath) {
+		assert(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) != -1);
+		Mix_Chunk* effect{ Mix_LoadWAV(filepath.c_str()) };
+		assert(effect);
+
+		return effect;
+	}
+
+	void Asset::FreeTexture(SDL_Texture* texture) {
+		SDL_DestroyTexture(texture);
+		texture = nullptr;
+	}
+
+	void Asset::FreeMusic(Mix_Music* music) {
+		Mix_FreeMusic(music);
+		music = nullptr;
 	}
 
 	// ----------------------------------------------------------------
@@ -258,6 +298,90 @@ namespace clf {
 	void Draw::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
 		SDL_RenderCopy(clf::Engine::renderer, texture, nullptr, &destination);
 	}
+
+	// ----------------------------------------------------------------
+	// - Sound Specification		                                  -
+	// ----------------------------------------------------------------
+	class Sound {
+	private:
+		Sound() = default;
+		~Sound() = default;
+	public:
+		static bool isPlayingMusic();
+		static int GetMusicVolume();
+		static void SetMusicVolume(unsigned int volume);
+		static void PauseMusic();
+		static void ResumeMusic();
+		static void PlayMusic(Mix_Music* music, bool isLoop, int repeat);
+		static void PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds);
+		static void FadeOutMusic(int miliseconds);
+		static void ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat);
+		static void ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
+		static void ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
+		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS);
+	};
+
+	// ----------------------------------------------------------------
+	// - Sound Implementation		                                  -
+	// ----------------------------------------------------------------
+	bool Sound::isPlayingMusic() {
+		return Mix_PlayingMusic();
+	}
+
+	int Sound::GetMusicVolume() {
+		return Mix_VolumeMusic(-1);
+	}
+
+	void Sound::SetMusicVolume(unsigned int volume) {
+		Mix_VolumeMusic(static_cast<int>(volume));
+	}
+
+	void Sound::PauseMusic() {
+		if (isPlayingMusic())
+			Mix_PauseMusic();
+	}
+
+	void Sound::ResumeMusic() {
+		Mix_ResumeMusic();
+	}
+
+	void Sound::PlayMusic(Mix_Music* music, bool isLoop, int repeat) {
+		int times{ isLoop ? -1 : repeat };
+		assert(Mix_PlayMusic(music, times) != -1);
+	}
+
+	void Sound::PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds) {
+		int loop{ isLoop ? -1 : 0 };
+		assert(Mix_FadeInMusic(music, loop, miliseconds)  != -1);
+	}
+
+	void Sound::FadeOutMusic(int miliseconds) {
+		while (!Mix_FadeOutMusic(miliseconds) && isPlayingMusic()) {
+			SDL_Delay(100);
+		}
+	}
+
+	void Sound::ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat) {
+		Mix_HaltMusic();
+		PlayMusic(newMusic, isLoop, repeat);
+	}
+
+	void Sound::ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+		Mix_HaltMusic();
+		PlayFadeInMusic(newMusic, isLoop, repeat, miliseconds);
+	}
+
+	void Sound::ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+		FadeOutMusic(miliseconds);
+		PlayMusic(newMusic, isLoop, repeat);
+	}
+
+	void Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS) {
+		FadeOutMusic(outMS);
+		PlayFadeInMusic(newMusic, isLoop, repeat, inMS);
+	}
+
+
 
 }
 
