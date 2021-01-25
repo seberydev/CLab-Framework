@@ -13,18 +13,18 @@ public:
 	SDL_Rect messageDST;
 	int counter{0};
 	Mix_Music* mainSound{ nullptr };
-	Mix_Music* secondSound{ nullptr };
+	Mix_Chunk* soundEffect{ nullptr };
 protected:
 	void OnStart() override {
 		characterTexture = clf::Asset::LoadSprite("assets/character.png");
 		message = clf::Asset::LoadText("assets/pico.ttf", 14, "The Best Game", messageColor, 0);
 		messageDST = { 20, 20, clf::Info::GetTextureWidth(message), clf::Info::GetTextureHeight(message) };
 		mainSound = clf::Asset::LoadMusic("assets/sound.ogg");
-		secondSound = clf::Asset::LoadMusic("assets/shoot.wav");
+		soundEffect = clf::Asset::LoadSound("assets/shoot.wav");
 		clf::Sound::SetMusicVolume(100);
-		clf::Sound::PlayFadeInMusic(mainSound, true, 0, 5000);
+		//clf::Sound::PlayFadeInMusic(mainSound, true, 0, 5000);
 
-		std::cout << clf::Sound::GetMusicVolume() << "\n";
+		std::cout << clf::Sound::GetChannelVolume(3) << "\n";
 	}
 
 	void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) override {
@@ -37,23 +37,23 @@ protected:
 		else if(keystates[SDL_SCANCODE_D]) 
 			characterDST.x += 1;
 
-		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_p)
-			clf::Sound::PauseMusic();
-		
-		if (keystates[SDL_SCANCODE_R]) 
-			clf::Sound::ResumeMusic();
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_z)
+			clf::Sound::PauseChannel(3);
 
-		if (keystates[SDL_SCANCODE_C])
-			clf::Sound::ChangeMusic(secondSound, false, 2);
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_x)
+			clf::Sound::ResumeChannel(3);
 
-		if (keystates[SDL_SCANCODE_F])
-			clf::Sound::FadeOutMusic(5000);
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_c)
+			clf::Sound::PlayChannel(3, soundEffect, false);
 
-		if (keystates[SDL_SCANCODE_Z])
-			clf::Sound::ChangeFadeOutMusic(secondSound, false, 3, 3000);
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_v)
+			clf::Sound::PlayFadeInChannel(3, soundEffect, false, 3000);
 
-		if (keystates[SDL_SCANCODE_O])
-			clf::Sound::ChangeFadeOutFadeInMusic(secondSound, false, 3, 1000, 3000);
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_b)
+			clf::Sound::FadeOutChannel(3, 3000);
+
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_n)
+			clf::Sound::PlayChannel(3, soundEffect, true);
 		
 		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_SPACE) {
 			++counter;
@@ -79,7 +79,8 @@ protected:
 		clf::Asset::FreeTexture(characterTexture);
 		clf::Asset::FreeTexture(message);
 		clf::Asset::FreeMusic(mainSound);
-		clf::Asset::FreeMusic(secondSound);
+		clf::Asset::FreeChannel(3);
+		clf::Asset::FreeSound(soundEffect);
 	}
 };
 

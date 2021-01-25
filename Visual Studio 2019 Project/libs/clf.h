@@ -159,9 +159,11 @@ namespace clf {
 		static SDL_Texture* LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 		static SDL_Texture* ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 		static Mix_Music* LoadMusic(const std::string& filepath);
-		static Mix_Chunk* LoadSoundEffect(const std::string& filepath);
+		static Mix_Chunk* LoadSound(const std::string& filepath);
 		static void FreeTexture(SDL_Texture* texture);
 		static void FreeMusic(Mix_Music* music);
+		static void FreeSound(Mix_Chunk* sound);
+		static void FreeChannel(unsigned int channel);
 	};
 
 	// ----------------------------------------------------------------
@@ -205,17 +207,16 @@ namespace clf {
 	}
 
 	Mix_Music* Asset::LoadMusic(const std::string& filepath) {
-		Mix_Music* sound{ Mix_LoadMUS(filepath.c_str()) };
-		assert(sound);
-		return sound;
+		Mix_Music* music{ Mix_LoadMUS(filepath.c_str()) };
+		assert(music);
+		return music;
 	}
 
-	Mix_Chunk* Asset::LoadSoundEffect(const std::string& filepath) {
-		assert(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) != -1);
-		Mix_Chunk* effect{ Mix_LoadWAV(filepath.c_str()) };
-		assert(effect);
-
-		return effect;
+	Mix_Chunk* Asset::LoadSound(const std::string& filepath) {
+		Mix_Chunk* sound{ Mix_LoadWAV(filepath.c_str()) };
+		assert(sound);
+		
+		return sound;
 	}
 
 	void Asset::FreeTexture(SDL_Texture* texture) {
@@ -226,6 +227,15 @@ namespace clf {
 	void Asset::FreeMusic(Mix_Music* music) {
 		Mix_FreeMusic(music);
 		music = nullptr;
+	}
+
+	void Asset::FreeSound(Mix_Chunk* sound) {
+		Mix_FreeChunk(sound);
+		sound = nullptr;
+	}
+
+	void Asset::FreeChannel(unsigned int channel) {
+		Mix_HaltChannel(static_cast<int>(channel));
 	}
 
 	// ----------------------------------------------------------------
@@ -299,7 +309,8 @@ namespace clf {
 		Sound() = default;
 		~Sound() = default;
 	public:
-		static bool isPlayingMusic();
+		//Music Methods
+		static bool IsPlayingMusic();
 		static int GetMusicVolume();
 		static void SetMusicVolume(unsigned int volume);
 		static void PauseMusic();
@@ -311,12 +322,23 @@ namespace clf {
 		static void ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
 		static void ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
 		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS);
+		//Channel Methods (For sound effects)
+		static bool IsPlayingChannel(unsigned int channel);
+		static int GetChannelVolume(unsigned int channel);
+		static void SetChannelVolume(unsigned int channel, unsigned int volume);
+		static void PauseChannel(unsigned int channel);
+		static void ResumeChannel(unsigned int channel);
+		static void PlayChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop);
+		static void PlayChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat);
+		static void PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop, int miliseconds);
+		static void PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat, int miliseconds);
+		static void FadeOutChannel(unsigned int channel, unsigned int miliseconds);
 	};
 
 	// ----------------------------------------------------------------
 	// - Sound Implementation		                                  -
 	// ----------------------------------------------------------------
-	bool Sound::isPlayingMusic() {
+	bool Sound::IsPlayingMusic() {
 		return Mix_PlayingMusic();
 	}
 
@@ -329,7 +351,7 @@ namespace clf {
 	}
 
 	void Sound::PauseMusic() {
-		if (isPlayingMusic())
+		if (IsPlayingMusic())
 			Mix_PauseMusic();
 	}
 
@@ -348,7 +370,7 @@ namespace clf {
 	}
 
 	void Sound::FadeOutMusic(int miliseconds) {
-		while (!Mix_FadeOutMusic(miliseconds) && isPlayingMusic()) {
+		while (!Mix_FadeOutMusic(miliseconds) && IsPlayingMusic()) {
 			SDL_Delay(100);
 		}
 	}
@@ -373,7 +395,47 @@ namespace clf {
 		PlayFadeInMusic(newMusic, isLoop, repeat, inMS);
 	}
 
+	bool Sound::IsPlayingChannel(unsigned int channel) {
+		return Mix_Playing(static_cast<int>(channel));
+	}
 
+	int Sound::GetChannelVolume(unsigned int channel) {
+		return Mix_Volume(static_cast<int>(channel), -1);
+	}
+
+	void Sound::SetChannelVolume(unsigned int channel, unsigned int volume) {
+		Mix_Volume(static_cast<int>(channel), static_cast<int>(volume));
+	}
+
+	void Sound::PauseChannel(unsigned int channel) {
+		Mix_Pause(static_cast<int>(channel));
+	}
+
+	void Sound::ResumeChannel(unsigned int channel) {
+		Mix_Resume(static_cast<int>(channel));
+	}
+
+	void Sound::PlayChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop) {
+		assert(Mix_PlayChannel(static_cast<int>(channel), sound, isLoop ? -1 : 0) != -1);
+	}
+
+	void Sound::PlayChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat) {
+		assert(Mix_PlayChannel(static_cast<int>(channel), sound, static_cast<int>(repeat)) != -1);
+	}
+
+	void Sound::PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat, int miliseconds) {
+		Mix_HaltChannel(static_cast<int>(channel));
+		assert(Mix_FadeInChannel(static_cast<int>(channel), sound, static_cast<int>(repeat), miliseconds) != -1);
+	}
+
+	void Sound::PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop, int miliseconds) {
+		Mix_HaltChannel(static_cast<int>(channel));
+		assert(Mix_FadeInChannel(static_cast<int>(channel), sound, isLoop ? -1 : 0, miliseconds) != -1);
+	}
+
+	void Sound::FadeOutChannel(unsigned int channel, unsigned int miliseconds) {
+		Mix_FadeOutChannel(static_cast<int>(channel), static_cast<int>(miliseconds));
+	}
 
 }
 

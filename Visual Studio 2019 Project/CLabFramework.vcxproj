@@ -178,6 +178,7 @@
     <Font Include="assets\pico.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\pop.ogg" />
     <None Include="assets\sound.ogg" />
   </ItemGroup>
   <ItemGroup>

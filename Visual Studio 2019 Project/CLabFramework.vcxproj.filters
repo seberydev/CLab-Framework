@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\sound.ogg" />
+    <None Include="assets\pop.ogg" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\shoot.wav">
