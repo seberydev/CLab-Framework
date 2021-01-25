@@ -23,15 +23,13 @@ namespace clf {
 		static SDL_Renderer* renderer;
 	protected:
 		virtual void OnStart() = 0;
-		virtual void OnInput(const Uint8* keystates) = 0;
+		virtual void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) = 0;
 		virtual void OnUpdate(float deltaTime) = 0;
 		virtual void OnRender() = 0;
 		virtual void OnFinish() = 0;
 	private:
 		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		void CalcDeltaTime();
-		const int FPS{ 60 };
-		const int FRAME_TARGET{ 1000 / FPS };
 		const float MAX_DELTA_TIME{ 0.05f };
 		int ticksLastFrame{ 0 };
 		float deltaTime{ 0.0f };
@@ -54,14 +52,12 @@ namespace clf {
 		while (isRunning) {
 			CalcDeltaTime();
 
-			while (SDL_PollEvent(&event) != 0) {
-				if (event.type == SDL_QUIT)
-					isRunning = false;
-			}
+			if (event.type == SDL_QUIT)
+				isRunning = false;
 
 			const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-			OnInput(keystates);
+			OnInput(keystates, event, SDL_PollEvent(&event));
 			OnUpdate(deltaTime);
 			OnRender();
 
@@ -115,10 +111,6 @@ namespace clf {
 	}
 
 	void Engine::CalcDeltaTime() {
-		int delay = FRAME_TARGET - (SDL_GetTicks() - ticksLastFrame);
-
-		if (delay > 0 && delay <= FRAME_TARGET) SDL_Delay(delay);
-
 		deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
 		deltaTime = (deltaTime > MAX_DELTA_TIME) ? MAX_DELTA_TIME : deltaTime;
 

@@ -27,7 +27,7 @@ protected:
 		std::cout << clf::Sound::GetMusicVolume() << "\n";
 	}
 
-	void OnInput(const Uint8* keystates) override {
+	void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) override {
 		if (keystates[SDL_SCANCODE_W]) 
 			characterDST.y -= 1;
 		else if (keystates[SDL_SCANCODE_A]) 
@@ -37,7 +37,7 @@ protected:
 		else if(keystates[SDL_SCANCODE_D]) 
 			characterDST.x += 1;
 
-		if (keystates[SDL_SCANCODE_P]) 
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_p)
 			clf::Sound::PauseMusic();
 		
 		if (keystates[SDL_SCANCODE_R]) 
@@ -55,7 +55,7 @@ protected:
 		if (keystates[SDL_SCANCODE_O])
 			clf::Sound::ChangeFadeOutFadeInMusic(secondSound, false, 3, 1000, 3000);
 		
-		if (keystates[SDL_SCANCODE_SPACE]) {
+		if (events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_SPACE) {
 			++counter;
 			message = clf::Asset::ChangeText(message, "assets/pico.ttf", 16, std::to_string(counter), messageColor, 1);
 			messageDST = { 20, 20, clf::Info::GetTextureWidth(message), clf::Info::GetTextureHeight(message) };
