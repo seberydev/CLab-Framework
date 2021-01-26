@@ -50,14 +50,17 @@ namespace clf {
 		OnStart();
 
 		while (isRunning) {
-			CalcDeltaTime();
+			CalcDeltaTime();			
 
-			if (event.type == SDL_QUIT)
-				isRunning = false;
+			
+			while (SDL_PollEvent(&event) != 0) {
+				if (event.type == SDL_QUIT)
+					isRunning = false;
+			}
 
 			const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-			OnInput(keystates, event, SDL_PollEvent(&event));
+			OnInput(keystates, event, 3);
 			OnUpdate(deltaTime);
 			OnRender();
 
@@ -310,34 +313,33 @@ namespace clf {
 		~Sound() = default;
 	public:
 		//Music Methods
-		static bool IsPlayingMusic();
+		static bool IsPlayingMusic(); 
 		static int GetMusicVolume();
-		static void SetMusicVolume(unsigned int volume);
-		static void PauseMusic();
-		static void ResumeMusic();
-		static void PlayMusic(Mix_Music* music, bool isLoop, int repeat);
-		static void PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds);
-		static void FadeOutMusic(int miliseconds);
-		static void ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat);
-		static void ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
-		static void ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
-		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS);
+		static void SetMusicVolume(unsigned int volume); 
+		static void PauseMusic(); 
+		static void ResumeMusic(); 
+		static void PlayMusic(Mix_Music* music, int repeat); 
+		static void PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds); //
+		static void FadeOutMusic(unsigned int miliseconds); 
+		static void ChangeMusic(Mix_Music* newMusic, int repeat);
+		static void ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
+		static void ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
+		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS);
 		//Channel Methods (For sound effects)
-		static bool IsPlayingChannel(unsigned int channel);
-		static int GetChannelVolume(unsigned int channel);
-		static void SetChannelVolume(unsigned int channel, unsigned int volume);
-		static void PauseChannel(unsigned int channel);
-		static void ResumeChannel(unsigned int channel);
-		static void PlayChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop);
-		static void PlayChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat);
-		static void PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop, int miliseconds);
-		static void PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat, int miliseconds);
-		static void FadeOutChannel(unsigned int channel, unsigned int miliseconds);
+		static bool IsPlayingChannel(int channel);
+		static int GetChannelVolume(int channel);
+		static void SetChannelVolume(int channel, unsigned int volume);
+		static void PauseChannel(int channel);
+		static void ResumeChannel(int channel);
+		static void PlayChannel(int channel, Mix_Chunk* sound, int repeat);
+		static void PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds);
+		static void FadeOutChannel(int channel, unsigned int miliseconds);
 	};
 
 	// ----------------------------------------------------------------
 	// - Sound Implementation		                                  -
 	// ----------------------------------------------------------------
+	//Music Methods
 	bool Sound::IsPlayingMusic() {
 		return Mix_PlayingMusic();
 	}
@@ -358,83 +360,73 @@ namespace clf {
 	void Sound::ResumeMusic() {
 		Mix_ResumeMusic();
 	}
-
-	void Sound::PlayMusic(Mix_Music* music, bool isLoop, int repeat) {
-		int times{ isLoop ? -1 : repeat };
-		assert(Mix_PlayMusic(music, times) != -1);
+	
+	void Sound::PlayMusic(Mix_Music* music, int repeat) {
+		assert(Mix_PlayMusic(music, repeat) != -1);
 	}
 
-	void Sound::PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds) {
-		int loop{ isLoop ? -1 : 0 };
-		assert(Mix_FadeInMusic(music, loop, miliseconds)  != -1);
+	void Sound::PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds) {
+		assert(Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds)) != -1);
 	}
 
-	void Sound::FadeOutMusic(int miliseconds) {
-		while (!Mix_FadeOutMusic(miliseconds) && IsPlayingMusic()) {
+	void Sound::FadeOutMusic(unsigned int miliseconds) {
+		while (!Mix_FadeOutMusic(static_cast<int>(miliseconds)) && IsPlayingMusic()) {
 			SDL_Delay(100);
 		}
 	}
 
-	void Sound::ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat) {
+	void Sound::ChangeMusic(Mix_Music* newMusic, int repeat) {
 		Mix_HaltMusic();
-		PlayMusic(newMusic, isLoop, repeat);
+		PlayMusic(newMusic, repeat);
 	}
 
-	void Sound::ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+	void Sound::ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
 		Mix_HaltMusic();
-		PlayFadeInMusic(newMusic, isLoop, repeat, miliseconds);
+		PlayFadeInMusic(newMusic, repeat, miliseconds);
 	}
 
-	void Sound::ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+	void Sound::ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
 		FadeOutMusic(miliseconds);
-		PlayMusic(newMusic, isLoop, repeat);
+		PlayMusic(newMusic, repeat);
 	}
 
-	void Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS) {
+	void Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS) {
 		FadeOutMusic(outMS);
-		PlayFadeInMusic(newMusic, isLoop, repeat, inMS);
+		PlayFadeInMusic(newMusic, repeat, inMS);
 	}
 
-	bool Sound::IsPlayingChannel(unsigned int channel) {
-		return Mix_Playing(static_cast<int>(channel));
+	//Channel Methods
+	bool Sound::IsPlayingChannel(int channel) {
+		return Mix_Playing(channel);
 	}
 
-	int Sound::GetChannelVolume(unsigned int channel) {
-		return Mix_Volume(static_cast<int>(channel), -1);
+	int Sound::GetChannelVolume(int channel) {
+		return Mix_Volume(channel, -1);
 	}
 
-	void Sound::SetChannelVolume(unsigned int channel, unsigned int volume) {
-		Mix_Volume(static_cast<int>(channel), static_cast<int>(volume));
+	void Sound::SetChannelVolume(int channel, unsigned int volume) {
+		Mix_Volume(channel, static_cast<int>(volume));
 	}
 
-	void Sound::PauseChannel(unsigned int channel) {
-		Mix_Pause(static_cast<int>(channel));
+	void Sound::PauseChannel(int channel) {
+		Mix_Pause(channel);
 	}
 
-	void Sound::ResumeChannel(unsigned int channel) {
-		Mix_Resume(static_cast<int>(channel));
+	void Sound::ResumeChannel(int channel) {
+		Mix_Resume(channel);
 	}
 
-	void Sound::PlayChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop) {
-		assert(Mix_PlayChannel(static_cast<int>(channel), sound, isLoop ? -1 : 0) != -1);
+	void Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
+		assert(Mix_PlayChannel(channel, sound, repeat) != -1);
 	}
 
-	void Sound::PlayChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat) {
-		assert(Mix_PlayChannel(static_cast<int>(channel), sound, static_cast<int>(repeat)) != -1);
-	}
-
-	void Sound::PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, unsigned int repeat, int miliseconds) {
+	void Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
 		Mix_HaltChannel(static_cast<int>(channel));
-		assert(Mix_FadeInChannel(static_cast<int>(channel), sound, static_cast<int>(repeat), miliseconds) != -1);
+		assert(Mix_FadeInChannel(channel, sound, repeat, miliseconds) != -1);
 	}
 
-	void Sound::PlayFadeInChannel(unsigned int channel, Mix_Chunk* sound, bool isLoop, int miliseconds) {
-		Mix_HaltChannel(static_cast<int>(channel));
-		assert(Mix_FadeInChannel(static_cast<int>(channel), sound, isLoop ? -1 : 0, miliseconds) != -1);
-	}
-
-	void Sound::FadeOutChannel(unsigned int channel, unsigned int miliseconds) {
-		Mix_FadeOutChannel(static_cast<int>(channel), static_cast<int>(miliseconds));
+	void Sound::FadeOutChannel(int channel, unsigned int miliseconds) {
+		Mix_FadeOutChannel(channel, static_cast<int>(miliseconds));
 	}
 
 }
