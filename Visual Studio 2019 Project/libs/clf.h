@@ -22,11 +22,11 @@ namespace clf {
 		void Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		static SDL_Renderer* renderer;
 	protected:
-		virtual void OnStart() = 0;
-		virtual void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) = 0;
-		virtual void OnUpdate(float deltaTime) = 0;
-		virtual void OnRender() = 0;
-		virtual void OnFinish() = 0;
+		virtual void OnStart();
+		virtual void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents);
+		virtual void OnUpdate(float deltaTime);
+		virtual void OnRender();
+		virtual void OnFinish();
 	private:
 		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		void CalcDeltaTime();
@@ -44,6 +44,12 @@ namespace clf {
 	SDL_Renderer* Engine::renderer{nullptr};
 
 	//The core engine methods and structure
+	void Engine::OnStart() {  }
+	void Engine::OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) {  }
+	void Engine::OnUpdate(float deltaTime) {  }
+	void Engine::OnRender() {  }
+	void Engine::OnFinish() {  }
+
 	void Engine::Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags) {
 		assert(Initialize(title, screen_width, screen_height, subsystemFlags, windowFlags));
 
@@ -417,12 +423,12 @@ namespace clf {
 	}
 
 	void Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
-		assert(Mix_PlayChannel(channel, sound, repeat) != -1);
+		assert(Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat) != -1);
 	}
 
 	void Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
 		Mix_HaltChannel(static_cast<int>(channel));
-		assert(Mix_FadeInChannel(channel, sound, repeat, miliseconds) != -1);
+		assert(Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds) != -1);
 	}
 
 	void Sound::FadeOutChannel(int channel, unsigned int miliseconds) {

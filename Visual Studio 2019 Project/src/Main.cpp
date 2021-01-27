@@ -10,9 +10,14 @@ public:
 	SDL_Rect characterDir{ 0, 0, 0, 0 };
 	SDL_Texture* characterTexture{ nullptr };
 	float characterSpeed{ 520.0f };
+
+	Mix_Chunk* sound{ nullptr };
 protected:
 	void OnStart() override {
 		characterTexture = clf::Asset::LoadSprite("assets/character.png");
+
+		sound = clf::Asset::LoadSound("assets/shoot.wav");
+		clf::Sound::PlayFadeInChannel(2, sound, 2, 1000);
 	}
 
 	void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) override {
