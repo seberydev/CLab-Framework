@@ -8,7 +8,6 @@
 //STL Includes
 #include <string>
 #include <assert.h>
-#include <iostream>
 
 namespace clf {
 	// ----------------------------------------------------------------
@@ -23,7 +22,7 @@ namespace clf {
 		static SDL_Renderer* renderer;
 	protected:
 		virtual void OnStart();
-		virtual void OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents);
+		virtual void OnInput(const Uint8* keystates);
 		virtual void OnUpdate(float deltaTime);
 		virtual void OnRender();
 		virtual void OnFinish();
@@ -45,7 +44,7 @@ namespace clf {
 
 	//The core engine methods and structure
 	void Engine::OnStart() {  }
-	void Engine::OnInput(const Uint8* keystates, const SDL_Event& events, int currentEvents) {  }
+	void Engine::OnInput(const Uint8* keystates) {  }
 	void Engine::OnUpdate(float deltaTime) {  }
 	void Engine::OnRender() {  }
 	void Engine::OnFinish() {  }
@@ -66,7 +65,7 @@ namespace clf {
 
 			const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-			OnInput(keystates, event, 3);
+			OnInput(keystates);
 			OnUpdate(deltaTime);
 			OnRender();
 
@@ -248,12 +247,12 @@ namespace clf {
 	}
 
 	// ----------------------------------------------------------------
-	// - Draw Specification		                                      -
+	// - Render Specification		                                  -
 	// ----------------------------------------------------------------
-	class Draw {
+	class Render {
 	private:
-		Draw() = default;
-		~Draw() = default;
+		Render() = default;
+		~Render() = default;
 	public:
 		static void Clear(const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
@@ -262,28 +261,30 @@ namespace clf {
 		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
 		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
 		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
+		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip);
 		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);
+		static void DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip);
 	};
 
 	// ----------------------------------------------------------------
-	// - Draw Implementation                                          -
+	// - Render Implementation                                        -
 	// ----------------------------------------------------------------
-	void Draw::Clear(const SDL_Color& color) {
+	void Render::Clear(const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderClear(clf::Engine::renderer);
 	}
 
-	void Draw::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
+	void Render::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderFillRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
+	void Render::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
+	void Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
 		const double PI = 3.1415926535;
 		double x1{ 0.0 }, y1{ 0.0 };
 		
@@ -296,7 +297,7 @@ namespace clf {
 		}
 	}
 
-	void Draw::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
+	void Render::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
 		int maxX{ topLeft.x + (radius * 2) - 1 }, maxY{ topLeft.y + (radius * 2) - 1 };
 		int squaredRadius{ radius * radius };
 		int cX{ topLeft.x + radius }, cY{ topLeft.y + radius };
@@ -312,19 +313,27 @@ namespace clf {
 		}
 	}
 
-	void Draw::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
+	void Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
 		SDL_Point vertices[4] = {v1, v2, v3, v1};
 
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawLines(clf::Engine::renderer, vertices, 4);
 	}
 
-	void Draw::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
-		SDL_RenderCopy(clf::Engine::renderer, texture, &source, &destination);
+	void Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
+		DrawSpriteRot(texture, source, destination, 0.0, nullptr, SDL_FLIP_NONE);
 	}
 
-	void Draw::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
-		SDL_RenderCopy(clf::Engine::renderer, texture, nullptr, &destination);
+	void Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
+		SDL_RenderCopyEx(clf::Engine::renderer, texture, &source, &destination, angle, center, flip);
+	}
+
+	void Render::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
+		DrawTextRot(texture, destination, 0.0, nullptr, SDL_FLIP_NONE);
+	}
+
+	void Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
+		SDL_RenderCopyEx(clf::Engine::renderer, texture, nullptr, &destination, angle, center, flip);
 	}
 
 	// ----------------------------------------------------------------

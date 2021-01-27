@@ -8,7 +8,6 @@
 //STL Includes
 #include <string>
 #include <assert.h>
-#include <iostream>
 
 namespace clf {
 	// ----------------------------------------------------------------
@@ -22,16 +21,14 @@ namespace clf {
 		void Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		static SDL_Renderer* renderer;
 	protected:
-		virtual void OnStart() = 0;
-		virtual void OnInput(const Uint8* keystates) = 0;
-		virtual void OnUpdate(float deltaTime) = 0;
-		virtual void OnRender() = 0;
-		virtual void OnFinish() = 0;
+		virtual void OnStart();
+		virtual void OnInput(const Uint8* keystates);
+		virtual void OnUpdate(float deltaTime);
+		virtual void OnRender();
+		virtual void OnFinish();
 	private:
 		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		void CalcDeltaTime();
-		const int FPS{ 60 };
-		const int FRAME_TARGET{ 1000 / FPS };
 		const float MAX_DELTA_TIME{ 0.05f };
 		int ticksLastFrame{ 0 };
 		float deltaTime{ 0.0f };
@@ -46,14 +43,21 @@ namespace clf {
 	SDL_Renderer* Engine::renderer{nullptr};
 
 	//The core engine methods and structure
+	void Engine::OnStart() {  }
+	void Engine::OnInput(const Uint8* keystates) {  }
+	void Engine::OnUpdate(float deltaTime) {  }
+	void Engine::OnRender() {  }
+	void Engine::OnFinish() {  }
+
 	void Engine::Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags) {
 		assert(Initialize(title, screen_width, screen_height, subsystemFlags, windowFlags));
 
 		OnStart();
 
 		while (isRunning) {
-			CalcDeltaTime();
+			CalcDeltaTime();			
 
+			
 			while (SDL_PollEvent(&event) != 0) {
 				if (event.type == SDL_QUIT)
 					isRunning = false;
@@ -115,10 +119,6 @@ namespace clf {
 	}
 
 	void Engine::CalcDeltaTime() {
-		int delay = FRAME_TARGET - (SDL_GetTicks() - ticksLastFrame);
-
-		if (delay > 0 && delay <= FRAME_TARGET) SDL_Delay(delay);
-
 		deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
 		deltaTime = (deltaTime > MAX_DELTA_TIME) ? MAX_DELTA_TIME : deltaTime;
 
@@ -167,9 +167,11 @@ namespace clf {
 		static SDL_Texture* LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 		static SDL_Texture* ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
 		static Mix_Music* LoadMusic(const std::string& filepath);
-		static Mix_Chunk* LoadSoundEffect(const std::string& filepath);
+		static Mix_Chunk* LoadSound(const std::string& filepath);
 		static void FreeTexture(SDL_Texture* texture);
 		static void FreeMusic(Mix_Music* music);
+		static void FreeSound(Mix_Chunk* sound);
+		static void FreeChannel(unsigned int channel);
 	};
 
 	// ----------------------------------------------------------------
@@ -213,17 +215,16 @@ namespace clf {
 	}
 
 	Mix_Music* Asset::LoadMusic(const std::string& filepath) {
-		Mix_Music* sound{ Mix_LoadMUS(filepath.c_str()) };
-		assert(sound);
-		return sound;
+		Mix_Music* music{ Mix_LoadMUS(filepath.c_str()) };
+		assert(music);
+		return music;
 	}
 
-	Mix_Chunk* Asset::LoadSoundEffect(const std::string& filepath) {
-		assert(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) != -1);
-		Mix_Chunk* effect{ Mix_LoadWAV(filepath.c_str()) };
-		assert(effect);
-
-		return effect;
+	Mix_Chunk* Asset::LoadSound(const std::string& filepath) {
+		Mix_Chunk* sound{ Mix_LoadWAV(filepath.c_str()) };
+		assert(sound);
+		
+		return sound;
 	}
 
 	void Asset::FreeTexture(SDL_Texture* texture) {
@@ -236,42 +237,54 @@ namespace clf {
 		music = nullptr;
 	}
 
+	void Asset::FreeSound(Mix_Chunk* sound) {
+		Mix_FreeChunk(sound);
+		sound = nullptr;
+	}
+
+	void Asset::FreeChannel(unsigned int channel) {
+		Mix_HaltChannel(static_cast<int>(channel));
+	}
+
 	// ----------------------------------------------------------------
-	// - Draw Specification		                                      -
+	// - Render Specification		                                  -
 	// ----------------------------------------------------------------
-	class Draw {
+	class Render {
 	private:
-		Draw() = default;
-		~Draw() = default;
+		Render() = default;
+		~Render() = default;
 	public:
 		static void Clear(const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
 		static void DrawFillRect(const SDL_Rect& destination, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& destination, const SDL_Color& color);
-		static void DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color);
+		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
+		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
 		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
+		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip);
 		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);
+		static void DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip);
 	};
 
 	// ----------------------------------------------------------------
-	// - Draw Implementation                                          -
+	// - Render Implementation                                        -
 	// ----------------------------------------------------------------
-	void Draw::Clear(const SDL_Color& color) {
+	void Render::Clear(const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderClear(clf::Engine::renderer);
 	}
 
-	void Draw::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
+	void Render::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderFillRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
+	void Render::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color) {
+	void Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
 		const double PI = 3.1415926535;
 		double x1{ 0.0 }, y1{ 0.0 };
 		
@@ -280,23 +293,47 @@ namespace clf {
 			y1 = radius * sin(angle * PI / 180.0);
 
 			SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(point.x + x1), static_cast<float>(point.y + y1));
+			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(topLeft.x + x1), static_cast<float>(topLeft.y + y1));
 		}
 	}
 
-	void Draw::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
+	void Render::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
+		int maxX{ topLeft.x + (radius * 2) - 1 }, maxY{ topLeft.y + (radius * 2) - 1 };
+		int squaredRadius{ radius * radius };
+		int cX{ topLeft.x + radius }, cY{ topLeft.y + radius };
+		
+		for (int y{ topLeft.y + 1}; y <= maxY; ++y) {
+			for (int x{ topLeft.x + 1 }; x <= maxX; ++x) {
+				int distance = ((x - cX) * (x - cX)) + ((y - cY) * (y - cY));
+				if (distance <= squaredRadius) {
+					SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
+					SDL_RenderDrawPoint(clf::Engine::renderer, x, y);
+				}
+			}
+		}
+	}
+
+	void Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
 		SDL_Point vertices[4] = {v1, v2, v3, v1};
 
 		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawLines(clf::Engine::renderer, vertices, 4);
 	}
 
-	void Draw::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
-		SDL_RenderCopy(clf::Engine::renderer, texture, &source, &destination);
+	void Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
+		DrawSpriteRot(texture, source, destination, 0.0, nullptr, SDL_FLIP_NONE);
 	}
 
-	void Draw::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
-		SDL_RenderCopy(clf::Engine::renderer, texture, nullptr, &destination);
+	void Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
+		SDL_RenderCopyEx(clf::Engine::renderer, texture, &source, &destination, angle, center, flip);
+	}
+
+	void Render::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
+		DrawTextRot(texture, destination, 0.0, nullptr, SDL_FLIP_NONE);
+	}
+
+	void Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
+		SDL_RenderCopyEx(clf::Engine::renderer, texture, nullptr, &destination, angle, center, flip);
 	}
 
 	// ----------------------------------------------------------------
@@ -307,24 +344,35 @@ namespace clf {
 		Sound() = default;
 		~Sound() = default;
 	public:
-		static bool isPlayingMusic();
+		//Music Methods
+		static bool IsPlayingMusic(); 
 		static int GetMusicVolume();
-		static void SetMusicVolume(unsigned int volume);
-		static void PauseMusic();
-		static void ResumeMusic();
-		static void PlayMusic(Mix_Music* music, bool isLoop, int repeat);
-		static void PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds);
-		static void FadeOutMusic(int miliseconds);
-		static void ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat);
-		static void ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
-		static void ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds);
-		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS);
+		static void SetMusicVolume(unsigned int volume); 
+		static void PauseMusic(); 
+		static void ResumeMusic(); 
+		static void PlayMusic(Mix_Music* music, int repeat); 
+		static void PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds); //
+		static void FadeOutMusic(unsigned int miliseconds); 
+		static void ChangeMusic(Mix_Music* newMusic, int repeat);
+		static void ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
+		static void ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
+		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS);
+		//Channel Methods (For sound effects)
+		static bool IsPlayingChannel(int channel);
+		static int GetChannelVolume(int channel);
+		static void SetChannelVolume(int channel, unsigned int volume);
+		static void PauseChannel(int channel);
+		static void ResumeChannel(int channel);
+		static void PlayChannel(int channel, Mix_Chunk* sound, int repeat);
+		static void PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds);
+		static void FadeOutChannel(int channel, unsigned int miliseconds);
 	};
 
 	// ----------------------------------------------------------------
 	// - Sound Implementation		                                  -
 	// ----------------------------------------------------------------
-	bool Sound::isPlayingMusic() {
+	//Music Methods
+	bool Sound::IsPlayingMusic() {
 		return Mix_PlayingMusic();
 	}
 
@@ -337,51 +385,81 @@ namespace clf {
 	}
 
 	void Sound::PauseMusic() {
-		if (isPlayingMusic())
+		if (IsPlayingMusic())
 			Mix_PauseMusic();
 	}
 
 	void Sound::ResumeMusic() {
 		Mix_ResumeMusic();
 	}
-
-	void Sound::PlayMusic(Mix_Music* music, bool isLoop, int repeat) {
-		int times{ isLoop ? -1 : repeat };
-		assert(Mix_PlayMusic(music, times) != -1);
+	
+	void Sound::PlayMusic(Mix_Music* music, int repeat) {
+		assert(Mix_PlayMusic(music, repeat) != -1);
 	}
 
-	void Sound::PlayFadeInMusic(Mix_Music* music, bool isLoop, int repeat, int miliseconds) {
-		int loop{ isLoop ? -1 : 0 };
-		assert(Mix_FadeInMusic(music, loop, miliseconds)  != -1);
+	void Sound::PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds) {
+		assert(Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds)) != -1);
 	}
 
-	void Sound::FadeOutMusic(int miliseconds) {
-		while (!Mix_FadeOutMusic(miliseconds) && isPlayingMusic()) {
+	void Sound::FadeOutMusic(unsigned int miliseconds) {
+		while (!Mix_FadeOutMusic(static_cast<int>(miliseconds)) && IsPlayingMusic()) {
 			SDL_Delay(100);
 		}
 	}
 
-	void Sound::ChangeMusic(Mix_Music* newMusic, bool isLoop, int repeat) {
+	void Sound::ChangeMusic(Mix_Music* newMusic, int repeat) {
 		Mix_HaltMusic();
-		PlayMusic(newMusic, isLoop, repeat);
+		PlayMusic(newMusic, repeat);
 	}
 
-	void Sound::ChangeFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+	void Sound::ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
 		Mix_HaltMusic();
-		PlayFadeInMusic(newMusic, isLoop, repeat, miliseconds);
+		PlayFadeInMusic(newMusic, repeat, miliseconds);
 	}
 
-	void Sound::ChangeFadeOutMusic(Mix_Music* newMusic, bool isLoop, int repeat, int miliseconds) {
+	void Sound::ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
 		FadeOutMusic(miliseconds);
-		PlayMusic(newMusic, isLoop, repeat);
+		PlayMusic(newMusic, repeat);
 	}
 
-	void Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, bool isLoop, int repeat, int inMS, int outMS) {
+	void Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS) {
 		FadeOutMusic(outMS);
-		PlayFadeInMusic(newMusic, isLoop, repeat, inMS);
+		PlayFadeInMusic(newMusic, repeat, inMS);
 	}
 
+	//Channel Methods
+	bool Sound::IsPlayingChannel(int channel) {
+		return Mix_Playing(channel);
+	}
 
+	int Sound::GetChannelVolume(int channel) {
+		return Mix_Volume(channel, -1);
+	}
+
+	void Sound::SetChannelVolume(int channel, unsigned int volume) {
+		Mix_Volume(channel, static_cast<int>(volume));
+	}
+
+	void Sound::PauseChannel(int channel) {
+		Mix_Pause(channel);
+	}
+
+	void Sound::ResumeChannel(int channel) {
+		Mix_Resume(channel);
+	}
+
+	void Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
+		assert(Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat) != -1);
+	}
+
+	void Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
+		Mix_HaltChannel(static_cast<int>(channel));
+		assert(Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds) != -1);
+	}
+
+	void Sound::FadeOutChannel(int channel, unsigned int miliseconds) {
+		Mix_FadeOutChannel(channel, static_cast<int>(miliseconds));
+	}
 
 }
 
