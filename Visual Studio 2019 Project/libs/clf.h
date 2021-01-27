@@ -259,7 +259,8 @@ namespace clf {
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
 		static void DrawFillRect(const SDL_Rect& destination, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& destination, const SDL_Color& color);
-		static void DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color);
+		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
+		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
 		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
 		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);
 	};
@@ -282,7 +283,7 @@ namespace clf {
 		SDL_RenderDrawRect(clf::Engine::renderer, &destination);
 	}
 
-	void Draw::DrawCircle(const SDL_FPoint& point, double radius, const SDL_Color& color) {
+	void Draw::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
 		const double PI = 3.1415926535;
 		double x1{ 0.0 }, y1{ 0.0 };
 		
@@ -291,7 +292,23 @@ namespace clf {
 			y1 = radius * sin(angle * PI / 180.0);
 
 			SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(point.x + x1), static_cast<float>(point.y + y1));
+			SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(topLeft.x + x1), static_cast<float>(topLeft.y + y1));
+		}
+	}
+
+	void Draw::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
+		int maxX{ topLeft.x + (radius * 2) - 1 }, maxY{ topLeft.y + (radius * 2) - 1 };
+		int squaredRadius{ radius * radius };
+		int cX{ topLeft.x + radius }, cY{ topLeft.y + radius };
+		
+		for (int y{ topLeft.y + 1}; y <= maxY; ++y) {
+			for (int x{ topLeft.x + 1 }; x <= maxX; ++x) {
+				int distance = ((x - cX) * (x - cX)) + ((y - cY) * (y - cY));
+				if (distance <= squaredRadius) {
+					SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
+					SDL_RenderDrawPoint(clf::Engine::renderer, x, y);
+				}
+			}
 		}
 	}
 

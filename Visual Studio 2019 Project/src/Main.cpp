@@ -44,6 +44,7 @@ protected:
 	void OnRender() override {
 		clf::Draw::Clear({ 34, 56, 20, 255 });
 		clf::Draw::DrawSprite(characterTexture, characterSRC, characterDST);
+		clf::Draw::DrawFillCircle({ 1, 1 }, 20, { 255, 255, 255, 255 });
 	}
 
 	void OnFinish() override {
