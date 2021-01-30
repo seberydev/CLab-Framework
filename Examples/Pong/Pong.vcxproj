@@ -168,6 +168,9 @@
   <ItemGroup>
     <ClInclude Include="libs\clf.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\BoxfontRound.ttf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

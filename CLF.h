@@ -1,13 +1,16 @@
 #pragma once
 
-//SDL Includes
+//SDL Libraries
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
-//STL Includes
-#include <string>
+//Utilities
+#define NDEBUG
 #include <assert.h>
+#include <string>
+#include <chrono>
+
 
 namespace clf {
 	// ----------------------------------------------------------------
@@ -28,9 +31,7 @@ namespace clf {
 		virtual void OnFinish();
 	private:
 		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
-		void CalcDeltaTime();
-		const float MAX_DELTA_TIME{ 0.05f };
-		int ticksLastFrame{ 0 };
+		const float MAX_DELTA_TIME{ 0.005f };
 		float deltaTime{ 0.0f };
 		bool isRunning{ false };
 		SDL_Window* window{ nullptr };
@@ -50,13 +51,13 @@ namespace clf {
 	void Engine::OnFinish() {  }
 
 	void Engine::Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags) {
-		assert(Initialize(title, screen_width, screen_height, subsystemFlags, windowFlags));
+		bool init = Initialize(title, screen_width, screen_height, subsystemFlags, windowFlags);
+		assert(init);
 
 		OnStart();
 
 		while (isRunning) {
-			CalcDeltaTime();			
-
+			auto startTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 			
 			while (SDL_PollEvent(&event) != 0) {
 				if (event.type == SDL_QUIT)
@@ -70,6 +71,12 @@ namespace clf {
 			OnRender();
 
 			SDL_RenderPresent(renderer);
+
+			auto endTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
+
+			float elapsed = static_cast<float>((endTime - startTime) * 0.001);
+			deltaTime = elapsed; 
+			deltaTime = (deltaTime > MAX_DELTA_TIME) ? MAX_DELTA_TIME : deltaTime;
 		}
 
 		OnFinish();
@@ -95,7 +102,8 @@ namespace clf {
 		if (SDL_Init(subsystemFlags) < 0 || !IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) || TTF_Init() == -1 || !Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG))
 			return false;
 
-		assert(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) != -1);
+		int openAudio = Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
+		assert(openAudio != -1);
 
 		window = SDL_CreateWindow(
 			title.c_str(),
@@ -116,13 +124,6 @@ namespace clf {
 		isRunning = true;
 
 		return true;
-	}
-
-	void Engine::CalcDeltaTime() {
-		deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
-		deltaTime = (deltaTime > MAX_DELTA_TIME) ? MAX_DELTA_TIME : deltaTime;
-
-		ticksLastFrame = SDL_GetTicks();
 	}
 
 	// ----------------------------------------------------------------
@@ -180,7 +181,8 @@ namespace clf {
 	SDL_Texture* Asset::LoadSprite(const std::string& filepath) {
 		//Fails if the asset is not PNG or JPG
 		SDL_RWops* rwop{ SDL_RWFromFile(filepath.c_str(), "rb") };
-		assert(IMG_isPNG(rwop) || IMG_isJPG(rwop));
+		int acceptedFormat = (IMG_isPNG(rwop) || IMG_isJPG(rwop));
+		assert(acceptedFormat);
 
 		SDL_Surface* temp{ IMG_Load(filepath.c_str()) };
 		SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::renderer, temp) };
@@ -394,11 +396,13 @@ namespace clf {
 	}
 	
 	void Sound::PlayMusic(Mix_Music* music, int repeat) {
-		assert(Mix_PlayMusic(music, repeat) != -1);
+		int play = Mix_PlayMusic(music, repeat);
+		assert(play != -1);
 	}
 
 	void Sound::PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds) {
-		assert(Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds)) != -1);
+		int play = Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds));
+		assert(play != -1);
 	}
 
 	void Sound::FadeOutMusic(unsigned int miliseconds) {
@@ -449,12 +453,14 @@ namespace clf {
 	}
 
 	void Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
-		assert(Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat) != -1);
+		int play = Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat);
+		assert(play != -1);
 	}
 
 	void Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
 		Mix_HaltChannel(static_cast<int>(channel));
-		assert(Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds) != -1);
+		int play = Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds);
+		assert(play != -1);
 	}
 
 	void Sound::FadeOutChannel(int channel, unsigned int miliseconds) {

@@ -1,2 +1,0 @@
-C:\dev\CLab-Framework\Examples\Pong\Debug\Pong.exe
-C:\dev\CLab-Framework\Examples\Pong\Debug\Pong.pdb
