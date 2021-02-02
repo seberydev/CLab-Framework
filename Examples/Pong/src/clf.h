@@ -20,10 +20,10 @@ namespace clf {
 		Engine() = default;
 		virtual ~Engine() = default;
 	public:
-		void Build(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		void Build(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		static int ScreenWidth();
 		static int ScreenHeight();
-		static SDL_Renderer* renderer;
+		static SDL_Renderer* GetRenderer();
 	protected:
 		virtual void OnStart();
 		virtual void OnInput(const Uint8* keystates);
@@ -31,7 +31,8 @@ namespace clf {
 		virtual void OnRender();
 		virtual void OnFinish();
 	private:
-		bool Initialize(const std::string& title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		bool Initialize(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		static SDL_Renderer* renderer;
 		static SDL_Window* window;
 		const float MAX_DELTA_TIME{ 0.02f };
 		float deltaTime{ 0.0f };
@@ -80,11 +81,11 @@ namespace clf {
 		Asset() = default;
 		~Asset() = default;
 	public:
-		static SDL_Texture* LoadSprite(const std::string& filepath);
-		static SDL_Texture* LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
-		static SDL_Texture* ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline);
-		static Mix_Music* LoadMusic(const std::string& filepath);
-		static Mix_Chunk* LoadSound(const std::string& filepath);
+		static SDL_Texture* LoadSprite(const char* filepath);
+		static SDL_Texture* LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline);
+		static SDL_Texture* ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline);
+		static Mix_Music* LoadMusic(const char* filepath);
+		static Mix_Chunk* LoadSound(const char* filepath);
 		static void FreeTexture(SDL_Texture* texture);
 		static void FreeMusic(Mix_Music* music);
 		static void FreeSound(Mix_Chunk* sound);

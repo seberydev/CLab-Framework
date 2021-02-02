@@ -7,10 +7,12 @@ SDL_Renderer* clf::Engine::renderer{ nullptr };
 SDL_Window* clf::Engine::window{ nullptr };
 
 int clf::Engine::screenWidth;
-int clf::Engine::screenHeight;
+int clf::Engine::screenHeight; 
 
 int clf::Engine::ScreenWidth() { return screenWidth; }
 int clf::Engine::ScreenHeight() { return screenHeight; }
+
+SDL_Renderer* clf::Engine::GetRenderer() { return renderer; }
 
 //The core clf::Engine methods and structure
 void clf::Engine::OnStart() {  }
@@ -19,7 +21,7 @@ void clf::Engine::OnUpdate(float deltaTime) {  }
 void clf::Engine::OnRender() {  }
 void clf::Engine::OnFinish() {  }
 
-void clf::Engine::Build(const std::string& title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
+void clf::Engine::Build(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
 	bool init = Initialize(title, screenWidth, screenHeight, subsystemFlags, windowFlags);
 	assert(init);
 
@@ -70,7 +72,7 @@ void clf::Engine::Build(const std::string& title, int screenWidth, int screenHei
 }
 
 //Creates the window and renderer
-bool clf::Engine::Initialize(const std::string& title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
+bool clf::Engine::Initialize(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
 	if (SDL_Init(subsystemFlags) < 0 || !IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) || TTF_Init() == -1 || !Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG))
 		return false;
 
@@ -78,7 +80,7 @@ bool clf::Engine::Initialize(const std::string& title, int screenWidth, int scre
 	assert(openAudio != -1);
 
 	window = SDL_CreateWindow(
-		title.c_str(),
+		title,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		screenWidth,
@@ -118,14 +120,14 @@ int clf::Info::GetTextureHeight(SDL_Texture* texture) {
 // ----------------------------------------------------------------
 // - clf::Asset Implementation                                    -
 // ----------------------------------------------------------------
-SDL_Texture* clf::Asset::LoadSprite(const std::string& filepath) {
+SDL_Texture* clf::Asset::LoadSprite(const char* filepath) {
 	//Fails if the clf::Asset is not PNG or JPG
-	SDL_RWops* rwop{ SDL_RWFromFile(filepath.c_str(), "rb") };
+	SDL_RWops* rwop{ SDL_RWFromFile(filepath, "rb") };
 	int acceptedFormat = (IMG_isPNG(rwop) || IMG_isJPG(rwop));
 	assert(acceptedFormat);
 
-	SDL_Surface* temp{ IMG_Load(filepath.c_str()) };
-	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::renderer, temp) };
+	SDL_Surface* temp{ IMG_Load(filepath) };
+	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::GetRenderer(), temp) };
 
 	SDL_FreeSurface(temp);
 	temp = nullptr;
@@ -135,11 +137,11 @@ SDL_Texture* clf::Asset::LoadSprite(const std::string& filepath) {
 	return texture;
 }
 
-SDL_Texture* clf::Asset::LoadText(const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline) {
-	TTF_Font* font{ TTF_OpenFont(filepath.c_str(), size) };
+SDL_Texture* clf::Asset::LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline) {
+	TTF_Font* font{ TTF_OpenFont(filepath, size) };
 	TTF_SetFontOutline(font, outline);
-	SDL_Surface* temp{ TTF_RenderText_Blended(font, text.c_str(), color) };
-	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::renderer, temp) };
+	SDL_Surface* temp{ TTF_RenderText_Blended(font, text, color) };
+	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::GetRenderer(), temp) };
 
 	assert(texture);
 
@@ -151,19 +153,19 @@ SDL_Texture* clf::Asset::LoadText(const std::string& filepath, int size, const s
 	return texture;
 }
 
-SDL_Texture* clf::Asset::ChangeText(SDL_Texture* texture, const std::string& filepath, int size, const std::string& text, const SDL_Color& color, int outline) {
+SDL_Texture* clf::Asset::ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline) {
 	SDL_DestroyTexture(texture);
 	return LoadText(filepath, size, text, color, outline);
 }
 
-Mix_Music* clf::Asset::LoadMusic(const std::string& filepath) {
-	Mix_Music* music{ Mix_LoadMUS(filepath.c_str()) };
+Mix_Music* clf::Asset::LoadMusic(const char* filepath) {
+	Mix_Music* music{ Mix_LoadMUS(filepath) };
 	assert(music);
 	return music;
 }
 
-Mix_Chunk* clf::Asset::LoadSound(const std::string& filepath) {
-	Mix_Chunk* sound{ Mix_LoadWAV(filepath.c_str()) };
+Mix_Chunk* clf::Asset::LoadSound(const char* filepath) {
+	Mix_Chunk* sound{ Mix_LoadWAV(filepath) };
 	assert(sound);
 
 	return sound;
@@ -192,18 +194,18 @@ void clf::Asset::FreeChannel(unsigned int channel) {
 // - Render Implementation                                        -
 // ----------------------------------------------------------------
 void clf::Render::Clear(const SDL_Color& color) {
-	SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderClear(clf::Engine::renderer);
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderClear(clf::Engine::GetRenderer());
 }
 
 void clf::Render::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
-	SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderFillRect(clf::Engine::renderer, &destination);
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderFillRect(clf::Engine::GetRenderer(), &destination);
 }
 
 void clf::Render::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
-	SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderDrawRect(clf::Engine::renderer, &destination);
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawRect(clf::Engine::GetRenderer(), &destination);
 }
 
 void clf::Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
@@ -214,8 +216,8 @@ void clf::Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL
 		x1 = radius * cos(angle * PI / 180.0);
 		y1 = radius * sin(angle * PI / 180.0);
 
-		SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-		SDL_RenderDrawPointF(clf::Engine::renderer, static_cast<float>(topLeft.x + x1), static_cast<float>(topLeft.y + y1));
+		SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+		SDL_RenderDrawPointF(clf::Engine::GetRenderer(), static_cast<float>(topLeft.x + x1), static_cast<float>(topLeft.y + y1));
 	}
 }
 
@@ -228,8 +230,8 @@ void clf::Render::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL
 		for (int x{ topLeft.x + 1 }; x <= maxX; ++x) {
 			int distance = ((x - cX) * (x - cX)) + ((y - cY) * (y - cY));
 			if (distance <= squaredRadius) {
-				SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-				SDL_RenderDrawPoint(clf::Engine::renderer, x, y);
+				SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+				SDL_RenderDrawPoint(clf::Engine::GetRenderer(), x, y);
 			}
 		}
 	}
@@ -238,8 +240,8 @@ void clf::Render::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL
 void clf::Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
 	SDL_Point vertices[4] = { v1, v2, v3, v1 };
 
-	SDL_SetRenderDrawColor(clf::Engine::renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderDrawLines(clf::Engine::renderer, vertices, 4);
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawLines(clf::Engine::GetRenderer(), vertices, 4);
 }
 
 void clf::Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
@@ -247,7 +249,7 @@ void clf::Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const
 }
 
 void clf::Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
-	SDL_RenderCopyEx(clf::Engine::renderer, texture, &source, &destination, angle, center, flip);
+	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, &source, &destination, angle, center, flip);
 }
 
 void clf::Render::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
@@ -255,7 +257,7 @@ void clf::Render::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
 }
 
 void clf::Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
-	SDL_RenderCopyEx(clf::Engine::renderer, texture, nullptr, &destination, angle, center, flip);
+	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, nullptr, &destination, angle, center, flip);
 }
 
 // ----------------------------------------------------------------

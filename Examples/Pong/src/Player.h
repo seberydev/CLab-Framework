@@ -4,16 +4,18 @@
 
 class Player {
 public:
-	Player();
+	Player() = default;
 	~Player() = default;
 public:
-	void Init(int x, const SDL_Color& color);
+	void Init(int x, int speed, const SDL_Color& color);
 	void Draw();
 	void Move(float deltaTime);
-	void SetDir(float dir);
+	void SetDir(int dir);
+	const SDL_Rect& GetPos();
 private:
 	SDL_Rect pos;
 	SDL_Color color;
-	float dir;
-	float speed;
+	int dir;
+	int speed;
+	int maxY, minY;
 };

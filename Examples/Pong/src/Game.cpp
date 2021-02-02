@@ -2,9 +2,15 @@
 
 //Engine Methods
 void Game::OnStart() {
+	titleText = clf::Asset::LoadText("assets/fonts/BoxfontRound.ttf", 24, "Pong Game", clf::Color::MALIBU, 0);
+	titleTextDst = {
+		(ScreenWidth() / 2) - (clf::Info::GetTextureWidth(titleText) / 2), 20,
+		clf::Info::GetTextureWidth(titleText),
+		clf::Info::GetTextureHeight(titleText) };
 	padding.Init(10, clf::Color::ROYAL_BLUE);
-	p1.Init(padding.GetSize() + 10, clf::Color::POMEGRANATE);
-	p2.Init(ScreenWidth() - padding.GetSize() - 30, clf::Color::POMEGRANATE);
+	p1.Init(Padding::GetSize() + 10, 500, clf::Color::POMEGRANATE);
+	p2.Init(ScreenWidth() - Padding::GetSize() - 30, 500, clf::Color::POMEGRANATE);
+	ball.Init(10, 500, clf::Color::METALLIC_BRONZE);
 }
 
 void Game::OnInput(const Uint8* keystates) {
@@ -26,15 +32,18 @@ void Game::OnInput(const Uint8* keystates) {
 void Game::OnUpdate(float deltaTime) {
 	p1.Move(deltaTime);
 	p2.Move(deltaTime);
+	ball.Move(deltaTime, p1.GetPos(), p2.GetPos());
 }
 
 void Game::OnRender() {
 	clf::Render::Clear(clf::Color::PORTAFINO);
-	padding.Draw();
+	clf::Render::DrawText(titleText, titleTextDst);
 	p1.Draw();
 	p2.Draw();
+	ball.Draw();
+	padding.Draw();
 }
 
 void Game::OnFinish() {
-
+	clf::Asset::FreeTexture(titleText);
 }

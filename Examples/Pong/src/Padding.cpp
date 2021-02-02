@@ -2,6 +2,8 @@
 
 int Padding::GetSize() { return size; }
 
+int Padding::size;
+
 void Padding::Init(int size, const SDL_Color& color) {
 	this->size = size;
 	this->color = color;

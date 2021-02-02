@@ -7,11 +7,11 @@ public:
 	Padding() = default;
 	~Padding() = default;
 public:
+	static int GetSize();
 	void Init(int size, const SDL_Color& color);
 	void Draw();
-	int GetSize();
 private:
+	static int size;
 	SDL_Color color;
 	SDL_Rect up, right, down, left;
-	int size;
 };

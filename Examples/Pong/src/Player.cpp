@@ -1,13 +1,14 @@
 #include "Player.h"
+#include "Padding.h"
 
-Player::Player() 
-	: pos{ 0, 0, 20, 60 }, dir{ 0.0f }, speed{ 500.0f } {
+const SDL_Rect& Player::GetPos() { return pos; }
 
-}
-
-void Player::Init(int x, const SDL_Color& color) {
+void Player::Init(int x, int speed, const SDL_Color& color) {
 	this->color = color;
+	this->speed = speed;
 	pos = { x, clf::Engine::ScreenHeight() / 2 - 35, 20, 70 };
+	this->maxY = clf::Engine::ScreenHeight() - Padding::GetSize() - pos.h;
+	this->minY = Padding::GetSize();
 }
 
 void Player::Draw() {
@@ -16,8 +17,14 @@ void Player::Draw() {
 
 void Player::Move(float deltaTime) {
 	pos.y += static_cast<int>(speed * deltaTime * dir);
+
+	if (pos.y > maxY)
+		pos.y = maxY;
+
+	if (pos.y < minY)
+		pos.y = minY;
 }
 
-void Player::SetDir(float dir) {
+void Player::SetDir(int dir) {
 	this->dir = dir;
 }
