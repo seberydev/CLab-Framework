@@ -2,12 +2,28 @@
 
 //Engine Methods
 void Game::OnStart() {
-	titleText = clf::Asset::LoadText("assets/fonts/BoxfontRound.ttf", 24, "Pong Game", clf::Color::MALIBU, 0);
-	titleTextDst = {
-		(ScreenWidth() / 2) - (clf::Info::GetTextureWidth(titleText) / 2), 20,
-		clf::Info::GetTextureWidth(titleText),
-		clf::Info::GetTextureHeight(titleText) };
+	//Initialize Texts
+	const char* mainFont = "assets/fonts/BoxfontRound.ttf";
+
+	titleText.Init(clf::Color::MALIBU, "Pong Game", mainFont, 32, TTF_STYLE_BOLD);
+	titleText.SetPos((ScreenWidth() / 2) - (titleText.GetPos().w / 2), 40);
+
+	p1Text.Init(clf::Color::MALIBU, "1 Player (R)", mainFont, 24, TTF_STYLE_NORMAL);
+	p1Text.SetPos((ScreenWidth() / 2) - (p1Text.GetPos().w / 2), (ScreenHeight() / 2) - (p1Text.GetPos().h / 2) - 20);
+
+	p2Text.Init(clf::Color::MALIBU, "2 Players (T)", mainFont, 24, TTF_STYLE_NORMAL);
+	p2Text.SetPos((ScreenWidth() / 2) - (p2Text.GetPos().w / 2), (ScreenHeight() / 2) - (p2Text.GetPos().h / 2) + 20);
+
+	p1ScoreText.Init(clf::Color::MALIBU, "0", mainFont, 32, TTF_STYLE_NORMAL);
+	p1ScoreText.SetPos(40, 40);
+
+	p2ScoreText.Init(clf::Color::MALIBU, "0", mainFont, 32, TTF_STYLE_NORMAL);
+	p2ScoreText.SetPos(ScreenWidth() - p2ScoreText.GetPos().w - 40, 40);
+
+	//Initialize Padding
 	padding.Init(10, clf::Color::ROYAL_BLUE);
+
+	//Initialize Players and Ball
 	p1.Init(Padding::GetSize() + 10, 500, clf::Color::POMEGRANATE);
 	p2.Init(ScreenWidth() - Padding::GetSize() - 30, 500, clf::Color::POMEGRANATE);
 	ball.Init(10, 500, clf::Color::METALLIC_BRONZE);
@@ -36,14 +52,23 @@ void Game::OnUpdate(float deltaTime) {
 }
 
 void Game::OnRender() {
+	//Render Padding and Background Color
 	clf::Render::Clear(clf::Color::PORTAFINO);
-	clf::Render::DrawText(titleText, titleTextDst);
+	padding.Draw();
+	
+	//Render Players and Ball
 	p1.Draw();
 	p2.Draw();
 	ball.Draw();
-	padding.Draw();
+
+	//Render Texts
+	titleText.Draw();
+	p1Text.Draw();
+	p2Text.Draw();
+	p1ScoreText.Draw();
+	p2ScoreText.Draw();
 }
 
 void Game::OnFinish() {
-	clf::Asset::FreeTexture(titleText);
+	
 }

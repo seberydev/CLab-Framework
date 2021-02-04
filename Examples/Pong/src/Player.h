@@ -11,7 +11,7 @@ public:
 	void Draw();
 	void Move(float deltaTime);
 	void SetDir(int dir);
-	const SDL_Rect& GetPos();
+	const SDL_Rect& GetPos() const;
 private:
 	SDL_Rect pos;
 	SDL_Color color;

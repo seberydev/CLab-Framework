@@ -15,6 +15,10 @@ void Padding::Init(int size, const SDL_Color& color) {
 }
 
 void Padding::Draw() {
+	//Draw Middle Line
+	clf::Render::DrawFillRect({ clf::Engine::ScreenWidth() / 2 - (size / 2), 0, size, clf::Engine::ScreenHeight() }, color);
+	
+	//Draw Padding
 	clf::Render::DrawFillRect(up, color);
 	clf::Render::DrawFillRect(right, color);
 	clf::Render::DrawFillRect(down, color);

@@ -6,8 +6,6 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 //Utilities
-#define NDEBUG
-#include <assert.h>
 #include <string>
 #include <chrono>
 
@@ -20,7 +18,7 @@ namespace clf {
 		Engine() = default;
 		virtual ~Engine() = default;
 	public:
-		void Build(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		bool Build(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
 		static int ScreenWidth();
 		static int ScreenHeight();
 		static SDL_Renderer* GetRenderer();
@@ -82,8 +80,8 @@ namespace clf {
 		~Asset() = default;
 	public:
 		static SDL_Texture* LoadSprite(const char* filepath);
-		static SDL_Texture* LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline);
-		static SDL_Texture* ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline);
+		static SDL_Texture* LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline, int style);
+		static SDL_Texture* ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline, int style);
 		static Mix_Music* LoadMusic(const char* filepath);
 		static Mix_Chunk* LoadSound(const char* filepath);
 		static void FreeTexture(SDL_Texture* texture);
@@ -101,6 +99,7 @@ namespace clf {
 		~Render() = default;
 	public:
 		static void Clear(const SDL_Color& color);
+		static void DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
 		static void DrawFillRect(const SDL_Rect& destination, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& destination, const SDL_Color& color);

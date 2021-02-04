@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Padding.h"
 #include "Ball.h"
+#include "Text.h"
 
 class Game : public clf::Engine {
 public:
@@ -14,8 +15,11 @@ private:
 	Player p1;
 	Player p2;
 	Ball ball;
-	SDL_Texture* titleText;
-	SDL_Rect titleTextDst;
+	Text titleText;
+	Text p1Text;
+	Text p2Text;
+	Text p1ScoreText;
+	Text p2ScoreText;
 protected:
 	void OnStart() override;
 	void OnInput(const Uint8* keystates) override;

@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Padding.h"
 
-const SDL_Rect& Player::GetPos() { return pos; }
+const SDL_Rect& Player::GetPos() const { return pos; }
 
 void Player::Init(int x, int speed, const SDL_Color& color) {
 	this->color = color;

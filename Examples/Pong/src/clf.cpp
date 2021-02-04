@@ -21,9 +21,9 @@ void clf::Engine::OnUpdate(float deltaTime) {  }
 void clf::Engine::OnRender() {  }
 void clf::Engine::OnFinish() {  }
 
-void clf::Engine::Build(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
-	bool init = Initialize(title, screenWidth, screenHeight, subsystemFlags, windowFlags);
-	assert(init);
+bool clf::Engine::Build(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
+	if (!Initialize(title, screenWidth, screenHeight, subsystemFlags, windowFlags))
+		return false;
 
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
@@ -69,6 +69,8 @@ void clf::Engine::Build(const char* title, int screenWidth, int screenHeight, in
 	SDL_DestroyWindow(window);
 	window = nullptr;
 	SDL_Quit();
+
+	return true;
 }
 
 //Creates the window and renderer
@@ -76,8 +78,8 @@ bool clf::Engine::Initialize(const char* title, int screenWidth, int screenHeigh
 	if (SDL_Init(subsystemFlags) < 0 || !IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) || TTF_Init() == -1 || !Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG))
 		return false;
 
-	int openAudio = Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
-	assert(openAudio != -1);
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
+		return false;
 
 	window = SDL_CreateWindow(
 		title,
@@ -123,8 +125,8 @@ int clf::Info::GetTextureHeight(SDL_Texture* texture) {
 SDL_Texture* clf::Asset::LoadSprite(const char* filepath) {
 	//Fails if the clf::Asset is not PNG or JPG
 	SDL_RWops* rwop{ SDL_RWFromFile(filepath, "rb") };
-	int acceptedFormat = (IMG_isPNG(rwop) || IMG_isJPG(rwop));
-	assert(acceptedFormat);
+	if (!(IMG_isPNG(rwop) || IMG_isJPG(rwop)))
+		return nullptr;
 
 	SDL_Surface* temp{ IMG_Load(filepath) };
 	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::GetRenderer(), temp) };
@@ -137,13 +139,12 @@ SDL_Texture* clf::Asset::LoadSprite(const char* filepath) {
 	return texture;
 }
 
-SDL_Texture* clf::Asset::LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline) {
+SDL_Texture* clf::Asset::LoadText(const char* filepath, int size, const char* text, const SDL_Color& color, int outline, int style) {
 	TTF_Font* font{ TTF_OpenFont(filepath, size) };
 	TTF_SetFontOutline(font, outline);
+	TTF_SetFontStyle(font, style);
 	SDL_Surface* temp{ TTF_RenderText_Blended(font, text, color) };
 	SDL_Texture* texture{ SDL_CreateTextureFromSurface(clf::Engine::GetRenderer(), temp) };
-
-	assert(texture);
 
 	SDL_FreeSurface(temp);
 	temp = nullptr;
@@ -153,21 +154,18 @@ SDL_Texture* clf::Asset::LoadText(const char* filepath, int size, const char* te
 	return texture;
 }
 
-SDL_Texture* clf::Asset::ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline) {
+SDL_Texture* clf::Asset::ChangeText(SDL_Texture* texture, const char* filepath, int size, const char* text, const SDL_Color& color, int outline, int style) {
 	SDL_DestroyTexture(texture);
-	return LoadText(filepath, size, text, color, outline);
+	return LoadText(filepath, size, text, color, outline, style);
 }
 
 Mix_Music* clf::Asset::LoadMusic(const char* filepath) {
 	Mix_Music* music{ Mix_LoadMUS(filepath) };
-	assert(music);
 	return music;
 }
 
 Mix_Chunk* clf::Asset::LoadSound(const char* filepath) {
 	Mix_Chunk* sound{ Mix_LoadWAV(filepath) };
-	assert(sound);
-
 	return sound;
 }
 
@@ -196,6 +194,10 @@ void clf::Asset::FreeChannel(unsigned int channel) {
 void clf::Render::Clear(const SDL_Color& color) {
 	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
 	SDL_RenderClear(clf::Engine::GetRenderer());
+}
+
+void clf::Render::DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color) {
+	SDL_RenderDrawLine(clf::Engine::GetRenderer(), start.x, start.y, end.x, end.y);
 }
 
 void clf::Render::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
@@ -286,13 +288,11 @@ void clf::Sound::ResumeMusic() {
 }
 
 void clf::Sound::PlayMusic(Mix_Music* music, int repeat) {
-	int play = Mix_PlayMusic(music, repeat);
-	assert(play != -1);
+	Mix_PlayMusic(music, repeat);
 }
 
 void clf::Sound::PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds) {
-	int play = Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds));
-	assert(play != -1);
+	Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds));
 }
 
 void clf::Sound::FadeOutMusic(unsigned int miliseconds) {
@@ -343,14 +343,12 @@ void clf::Sound::ResumeChannel(int channel) {
 }
 
 void clf::Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
-	int play = Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat);
-	assert(play != -1);
+	Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat);
 }
 
 void clf::Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
 	Mix_HaltChannel(static_cast<int>(channel));
-	int play = Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds);
-	assert(play != -1);
+	Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds);
 }
 
 void clf::Sound::FadeOutChannel(int channel, unsigned int miliseconds) {
