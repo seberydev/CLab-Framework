@@ -10,8 +10,10 @@ public:
 	void Init(int radius, int speed, const SDL_Color& color);
 	void Draw();
 	void Move(float deltaTime, const SDL_Rect& p1, const SDL_Rect& p2);
-	void Reset();
-	bool IsColliding(const SDL_Rect& rect);
+	bool Reset();
+	bool IsColliding(const SDL_Rect& rect) const;
+	int GetCenterY();
+	void SetDir(int x, int y);
 private:
 	SDL_Point pos;
 	SDL_Point startPos;

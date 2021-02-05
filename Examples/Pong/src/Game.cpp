@@ -2,6 +2,8 @@
 
 //Engine Methods
 void Game::OnStart() {
+	gameController.Init();
+
 	//Initialize Texts
 	const char* mainFont = "assets/fonts/BoxfontRound.ttf";
 
@@ -30,25 +32,34 @@ void Game::OnStart() {
 }
 
 void Game::OnInput(const Uint8* keystates) {
-	if (keystates[SDL_SCANCODE_W])
-		p1.SetDir(-1);
-	else if (keystates[SDL_SCANCODE_S])
-		p1.SetDir(1);
-	else 
-		p1.SetDir(0);
+	if (gameController.GetGameStarted()) {
+		p1.SetDir(keystates, SDL_SCANCODE_W, SDL_SCANCODE_S);
+		//p2.SetDir(keystates, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN);
+		p2.SetDirIA(ball.GetCenterY());
+	}
 
-	if (keystates[SDL_SCANCODE_UP])
-		p2.SetDir(-1);
-	else if (keystates[SDL_SCANCODE_DOWN])
-		p2.SetDir(1);
-	else
-		p2.SetDir(0);
+	//Start The Game For 1 Player or 2 Players
+	if (!gameController.GetGameStarted() && keystates[SDL_SCANCODE_R]) {
+		gameController.SetGameStarted(true);
+		ball.SetDir(-1, -1);
+	}
+
+	if (!gameController.GetGameStarted() && keystates[SDL_SCANCODE_T]) {
+		gameController.SetGameStarted(true);
+		ball.SetDir(0, 1);
+	}
 }
 
 void Game::OnUpdate(float deltaTime) {
 	p1.Move(deltaTime);
 	p2.Move(deltaTime);
 	ball.Move(deltaTime, p1.GetPos(), p2.GetPos());
+	
+	if (ball.Reset()) {
+		gameController.SetGameStarted(false);
+		p1.Reset();
+		p2.Reset();
+	}
 }
 
 void Game::OnRender() {
@@ -62,11 +73,15 @@ void Game::OnRender() {
 	ball.Draw();
 
 	//Render Texts
-	titleText.Draw();
-	p1Text.Draw();
-	p2Text.Draw();
-	p1ScoreText.Draw();
-	p2ScoreText.Draw();
+	if (gameController.GetGameStarted()) {
+		p1ScoreText.Draw();
+		p2ScoreText.Draw();
+	} else {
+		titleText.Draw();
+		p1Text.Draw();
+		p2Text.Draw();
+	}
+
 }
 
 void Game::OnFinish() {

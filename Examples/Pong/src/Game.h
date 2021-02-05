@@ -5,12 +5,14 @@
 #include "Padding.h"
 #include "Ball.h"
 #include "Text.h"
+#include "GameController.h"
 
 class Game : public clf::Engine {
 public:
 	Game() = default;
 	~Game() = default;
 private:
+	GameController gameController;
 	Padding padding;
 	Player p1;
 	Player p2;

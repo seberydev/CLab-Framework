@@ -1,12 +1,14 @@
 #include "Ball.h"
 #include "Padding.h"
 
+int Ball::GetCenterY() { return pos.y + radius; }
+
 void Ball::Init(int radius, int speed, const SDL_Color& color) {
 	this->radius = radius;
 	this->color = color;
 	this->speed = speed;
 	diameter = radius * 2;
-	dir = { -1, -1, 0, 0 };
+	dir = { 0, 0, 0, 0 };
 	startPos = pos = { (clf::Engine::ScreenWidth() / 2 - radius), (clf::Engine::ScreenHeight() / 2 - radius) };
 	
 	//Evaluate (minX, minY, maxX, maxY)
@@ -43,22 +45,30 @@ void Ball::Move(float deltaTime, const SDL_Rect& p1, const SDL_Rect& p2) {
 		pos.x = p2.x - diameter;
 	}
 
-	Reset();
 }
 
-void Ball::Reset() {
+bool Ball::Reset() {
 	if (pos.x + diameter >= minMaxPos.w || pos.x + diameter <= minMaxPos.x) {
 		dir.x = 0;
 		dir.y = 0;
 		pos.x = startPos.x;
 		pos.y = startPos.y;
+
+		return true;
 	}
+
+	return false;
 }
 
-bool Ball::IsColliding(const SDL_Rect& rect) {
+bool Ball::IsColliding(const SDL_Rect& rect) const {
 	return (
 		rect.x + rect.w >= pos.x &&
 		pos.x + diameter >= rect.x &&
 		rect.y + rect.h >= pos.y &&
 		pos.y + diameter >= rect.y);
+}
+
+void Ball::SetDir(int x, int y) {
+	dir.x = x;
+	dir.y = y;
 }
