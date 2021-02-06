@@ -1,15 +1,19 @@
 #include "Ball.h"
 #include "Padding.h"
 
-int Ball::GetCenterY() { return pos.y + radius; }
+SDL_Rect Ball::GetCenter() const {
+	return { pos.x + radius, pos.y + radius };
+}
 
 void Ball::Init(int radius, int speed, const SDL_Color& color) {
+	soundChannel = 2;
+	sound = clf::Asset::LoadSound("assets/sfx/pongSound.ogg");
 	this->radius = radius;
 	this->color = color;
 	this->speed = speed;
 	diameter = radius * 2;
 	dir = { 0, 0, 0, 0 };
-	startPos = pos = { (clf::Engine::ScreenWidth() / 2 - radius), (clf::Engine::ScreenHeight() / 2 - radius) };
+	startPos = pos = { (clf::Engine::HalfScreenWidth() - radius), (clf::Engine::HalfScreenHeight() - radius) };
 	
 	//Evaluate (minX, minY, maxX, maxY)
 	minMaxPos = { Padding::GetSize(), Padding::GetSize(), clf::Engine::ScreenWidth() - Padding::GetSize(), clf::Engine::ScreenHeight() - Padding::GetSize() };
@@ -36,11 +40,13 @@ void Ball::Move(float deltaTime, const SDL_Rect& p1, const SDL_Rect& p2) {
 
 	//Check Collision With Players
 	if (IsColliding(p1)) {
+		clf::Sound::PlayChannel(soundChannel, sound, 1);
 		dir.x *= -1;
 		pos.x = p1.x + p1.w;
 	}
 
 	if (IsColliding(p2)) {
+		clf::Sound::PlayChannel(soundChannel, sound, 1);
 		dir.x *= -1;
 		pos.x = p2.x - diameter;
 	}
@@ -53,7 +59,7 @@ bool Ball::Reset() {
 		dir.y = 0;
 		pos.x = startPos.x;
 		pos.y = startPos.y;
-
+		
 		return true;
 	}
 
@@ -72,3 +78,8 @@ void Ball::SetDir(int x, int y) {
 	dir.x = x;
 	dir.y = y;
 }
+
+void Ball::Finish() {
+	clf::Asset::FreeSound(sound);
+}
+

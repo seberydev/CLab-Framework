@@ -18,18 +18,25 @@ namespace clf {
 		Engine() = default;
 		virtual ~Engine() = default;
 	public:
-		bool Build(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		bool Build(const char* title, size_t screen_width, size_t screen_height, int subsystemFlags, int windowFlags, const char* iconPath);
 		static int ScreenWidth();
 		static int ScreenHeight();
+		static int HalfScreenWidth();
+		static int HalfScreenHeight();
 		static SDL_Renderer* GetRenderer();
 	protected:
+		//Initialize your stuff here
 		virtual void OnStart();
+		//Modify your stuff based in the input here
 		virtual void OnInput(const Uint8* keystates);
+		//Modify your stuff at a constant time step here
 		virtual void OnUpdate(float deltaTime);
+		//Draw your stuff in the screen here
 		virtual void OnRender();
+		//Free your stuff here
 		virtual void OnFinish();
 	private:
-		bool Initialize(const char* title, int screen_width, int screen_height, int subsystemFlags, int windowFlags);
+		bool Initialize(const char* title, size_t screen_width, size_t screen_height, int subsystemFlags, int windowFlags, const char* iconPath);
 		static SDL_Renderer* renderer;
 		static SDL_Window* window;
 		const float MAX_DELTA_TIME{ 0.02f };
@@ -87,7 +94,7 @@ namespace clf {
 		static void FreeTexture(SDL_Texture* texture);
 		static void FreeMusic(Mix_Music* music);
 		static void FreeSound(Mix_Chunk* sound);
-		static void FreeChannel(unsigned int channel);
+		static void FreeChannel(size_t channel);
 	};
 
 	// ----------------------------------------------------------------
@@ -122,25 +129,25 @@ namespace clf {
 		//Music Methods
 		static bool IsPlayingMusic(); 
 		static int GetMusicVolume();
-		static void SetMusicVolume(unsigned int volume); 
+		static void SetMusicVolume(size_t volume); 
 		static void PauseMusic(); 
 		static void ResumeMusic(); 
 		static void PlayMusic(Mix_Music* music, int repeat); 
-		static void PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds); //
-		static void FadeOutMusic(unsigned int miliseconds); 
+		static void PlayFadeInMusic(Mix_Music* music, int repeat, size_t miliseconds); //
+		static void FadeOutMusic(size_t miliseconds); 
 		static void ChangeMusic(Mix_Music* newMusic, int repeat);
-		static void ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
-		static void ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds);
-		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS);
+		static void ChangeFadeInMusic(Mix_Music* newMusic, int repeat, size_t miliseconds);
+		static void ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, size_t miliseconds);
+		static void ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, size_t inMS, size_t outMS);
 		//Channel Methods (For sound effects)
 		static bool IsPlayingChannel(int channel);
 		static int GetChannelVolume(int channel);
-		static void SetChannelVolume(int channel, unsigned int volume);
+		static void SetChannelVolume(int channel, size_t volume);
 		static void PauseChannel(int channel);
 		static void ResumeChannel(int channel);
 		static void PlayChannel(int channel, Mix_Chunk* sound, int repeat);
-		static void PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds);
-		static void FadeOutChannel(int channel, unsigned int miliseconds);
+		static void PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, size_t miliseconds);
+		static void FadeOutChannel(int channel, size_t miliseconds);
 	};
 		
 }

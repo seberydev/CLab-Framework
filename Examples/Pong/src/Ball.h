@@ -12,8 +12,9 @@ public:
 	void Move(float deltaTime, const SDL_Rect& p1, const SDL_Rect& p2);
 	bool Reset();
 	bool IsColliding(const SDL_Rect& rect) const;
-	int GetCenterY();
+	SDL_Rect GetCenter() const;
 	void SetDir(int x, int y);
+	void Finish();
 private:
 	SDL_Point pos;
 	SDL_Point startPos;
@@ -23,4 +24,6 @@ private:
 	int radius;
 	int speed;
 	int diameter;
+	Mix_Chunk* sound;
+	int soundChannel;
 };

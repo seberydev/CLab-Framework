@@ -8,7 +8,7 @@ const SDL_Rect& Player::GetPos() const { return pos; }
 void Player::Init(int x, int speed, const SDL_Color& color) {
 	this->color = color;
 	this->speed = speed;
-	startPos = pos = { x, clf::Engine::ScreenHeight() / 2 - 35, 20, 70 };
+	startPos = pos = { x, clf::Engine::HalfScreenHeight() - 35, 20, 70 };
 	this->maxY = clf::Engine::ScreenHeight() - Padding::GetSize() - pos.h;
 	this->minY = Padding::GetSize();
 }
@@ -36,7 +36,7 @@ void Player::SetDir(const Uint8* keystates, int upKey, int downKey) {
 		dir = 0;
 }
 
-void Player::SetDirIA(int centerBallY) {
+void Player::SetDirAI(int centerBallY) {
 	if (centerBallY < pos.y) 
 		dir = -1;
 	else if (centerBallY > pos.y + pos.h)

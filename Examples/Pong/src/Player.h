@@ -11,7 +11,7 @@ public:
 	void Draw();
 	void Move(float deltaTime);
 	void SetDir(const Uint8* keystates, int upKey, int downKey);
-	void SetDirIA(int centerBallY);
+	void SetDirAI(int centerBallY);
 	void Reset();
 	const SDL_Rect& GetPos() const;
 private:

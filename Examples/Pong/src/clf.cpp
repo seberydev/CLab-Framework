@@ -11,6 +11,8 @@ int clf::Engine::screenHeight;
 
 int clf::Engine::ScreenWidth() { return screenWidth; }
 int clf::Engine::ScreenHeight() { return screenHeight; }
+int clf::Engine::HalfScreenWidth() { return screenWidth / 2; }
+int clf::Engine::HalfScreenHeight() { return screenHeight / 2; }
 
 SDL_Renderer* clf::Engine::GetRenderer() { return renderer; }
 
@@ -21,8 +23,8 @@ void clf::Engine::OnUpdate(float deltaTime) {  }
 void clf::Engine::OnRender() {  }
 void clf::Engine::OnFinish() {  }
 
-bool clf::Engine::Build(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
-	if (!Initialize(title, screenWidth, screenHeight, subsystemFlags, windowFlags))
+bool clf::Engine::Build(const char* title, size_t screenWidth, size_t screenHeight, int subsystemFlags, int windowFlags, const char* iconPath) {
+	if (!Initialize(title, screenWidth, screenHeight, subsystemFlags, windowFlags, iconPath))
 		return false;
 
 	this->screenWidth = screenWidth;
@@ -74,7 +76,7 @@ bool clf::Engine::Build(const char* title, int screenWidth, int screenHeight, in
 }
 
 //Creates the window and renderer
-bool clf::Engine::Initialize(const char* title, int screenWidth, int screenHeight, int subsystemFlags, int windowFlags) {
+bool clf::Engine::Initialize(const char* title, size_t screenWidth, size_t screenHeight, int subsystemFlags, int windowFlags, const char* iconPath) {
 	if (SDL_Init(subsystemFlags) < 0 || !IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) || TTF_Init() == -1 || !Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG))
 		return false;
 
@@ -96,6 +98,11 @@ bool clf::Engine::Initialize(const char* title, int screenWidth, int screenHeigh
 
 	if (!renderer)
 		return false;
+
+	//Set Window Icon
+	SDL_Surface* icon{ IMG_Load(iconPath) };
+	SDL_SetWindowIcon(window, icon);
+	SDL_FreeSurface(icon);
 
 	isRunning = true;
 
@@ -184,7 +191,7 @@ void clf::Asset::FreeSound(Mix_Chunk* sound) {
 	sound = nullptr;
 }
 
-void clf::Asset::FreeChannel(unsigned int channel) {
+void clf::Asset::FreeChannel(size_t channel) {
 	Mix_HaltChannel(static_cast<int>(channel));
 }
 
@@ -274,7 +281,7 @@ int clf::Sound::GetMusicVolume() {
 	return Mix_VolumeMusic(-1);
 }
 
-void clf::Sound::SetMusicVolume(unsigned int volume) {
+void clf::Sound::SetMusicVolume(size_t volume) {
 	Mix_VolumeMusic(static_cast<int>(volume));
 }
 
@@ -291,11 +298,11 @@ void clf::Sound::PlayMusic(Mix_Music* music, int repeat) {
 	Mix_PlayMusic(music, repeat);
 }
 
-void clf::Sound::PlayFadeInMusic(Mix_Music* music, int repeat, unsigned int miliseconds) {
+void clf::Sound::PlayFadeInMusic(Mix_Music* music, int repeat, size_t miliseconds) {
 	Mix_FadeInMusic(music, repeat, static_cast<int>(miliseconds));
 }
 
-void clf::Sound::FadeOutMusic(unsigned int miliseconds) {
+void clf::Sound::FadeOutMusic(size_t miliseconds) {
 	while (!Mix_FadeOutMusic(static_cast<int>(miliseconds)) && IsPlayingMusic()) {
 		SDL_Delay(100);
 	}
@@ -306,17 +313,17 @@ void clf::Sound::ChangeMusic(Mix_Music* newMusic, int repeat) {
 	PlayMusic(newMusic, repeat);
 }
 
-void clf::Sound::ChangeFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
+void clf::Sound::ChangeFadeInMusic(Mix_Music* newMusic, int repeat, size_t miliseconds) {
 	Mix_HaltMusic();
 	PlayFadeInMusic(newMusic, repeat, miliseconds);
 }
 
-void clf::Sound::ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, unsigned int miliseconds) {
+void clf::Sound::ChangeFadeOutMusic(Mix_Music* newMusic, int repeat, size_t miliseconds) {
 	FadeOutMusic(miliseconds);
 	PlayMusic(newMusic, repeat);
 }
 
-void clf::Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, unsigned int inMS, unsigned int outMS) {
+void clf::Sound::ChangeFadeOutFadeInMusic(Mix_Music* newMusic, int repeat, size_t inMS, size_t outMS) {
 	FadeOutMusic(outMS);
 	PlayFadeInMusic(newMusic, repeat, inMS);
 }
@@ -330,7 +337,7 @@ int clf::Sound::GetChannelVolume(int channel) {
 	return Mix_Volume(channel, -1);
 }
 
-void clf::Sound::SetChannelVolume(int channel, unsigned int volume) {
+void clf::Sound::SetChannelVolume(int channel, size_t volume) {
 	Mix_Volume(channel, static_cast<int>(volume));
 }
 
@@ -346,11 +353,11 @@ void clf::Sound::PlayChannel(int channel, Mix_Chunk* sound, int repeat) {
 	Mix_PlayChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat);
 }
 
-void clf::Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, unsigned int miliseconds) {
+void clf::Sound::PlayFadeInChannel(int channel, Mix_Chunk* sound, int repeat, size_t miliseconds) {
 	Mix_HaltChannel(static_cast<int>(channel));
 	Mix_FadeInChannel(channel, sound, repeat > 0 ? repeat - 1 : repeat, miliseconds);
 }
 
-void clf::Sound::FadeOutChannel(int channel, unsigned int miliseconds) {
+void clf::Sound::FadeOutChannel(int channel, size_t miliseconds) {
 	Mix_FadeOutChannel(channel, static_cast<int>(miliseconds));
 }

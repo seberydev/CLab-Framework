@@ -1,9 +1,5 @@
 #include "Text.h"
 
-Text::~Text() {
-	clf::Asset::FreeTexture(texture);
-}
-
 const SDL_Rect& Text::GetPos() const { return pos; }
 
 void Text::Init(const SDL_Color& color, const char* text, const char* filepath, int size, int style) {
@@ -23,4 +19,8 @@ void Text::Draw() {
 void Text::SetPos(int x, int y) {
 	pos.x = x;
 	pos.y = y;
+}
+
+void Text::Finish() {
+	clf::Asset::FreeTexture(texture);
 }
