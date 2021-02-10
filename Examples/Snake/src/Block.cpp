@@ -14,6 +14,7 @@ Block::Block()
 void Block::SetPos(int x, int y) { pos.x = x; pos.y = y; }
 int Block::GetPosX() { return pos.x; }
 int Block::GetPosY() { return pos.y; }
+double Block::GetAngle() { return angle; }
 
 void Block::SetDir(int x, int y) { 
 	lastDir.x = pos.x;
@@ -27,8 +28,8 @@ int Block::GetDirY() { return dir.y; }
 void Block::SetAngle(double angle) { this->angle = angle; }
 
 //Methods
-void Block::Init(const char* filepath) {
-	texture = clf::Asset::LoadSprite(filepath);
+void Block::Init(SDL_Texture* texture) {
+	this->texture = texture;
 }
 
 void Block::Draw() {
@@ -36,5 +37,5 @@ void Block::Draw() {
 }
 
 void Block::Finish() {
-	clf::Asset::FreeTexture(texture);
+	texture = nullptr;
 }

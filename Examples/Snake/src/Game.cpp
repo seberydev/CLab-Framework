@@ -13,8 +13,8 @@ void Game::OnUpdate(float deltaTime) {
 }
 
 void Game::OnRender() {
-	clf::Render::Clear(clf::Color::POMEGRANATE);
-	map.DrawGrid();
+	clf::Render::Clear(clf::Color::SCREAMIN_GREEN);
+	//map.DrawGrid();
 	snake.Draw();
 }
 

@@ -16,9 +16,13 @@ public:
 	void Move(float deltaTime);
 	void Finish();
 private:
-	void SetHeadAngle();
+	double HeadAngle();
+	double TailAngle();
 	Timer timerToMove;
 	int tileSize;
 	std::array<Block, Map::size> blocks;
 	size_t currentBlocks;
+	SDL_Texture* head;
+	SDL_Texture* body;
+	SDL_Texture* tail;
 };
