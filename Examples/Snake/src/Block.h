@@ -19,6 +19,8 @@ public:
 	int GetDirY();
 	void SetAngle(double angle);
 	double GetAngle();
+	const SDL_Rect& GetPos() const;
+	bool IsColliding(const SDL_Rect& rect) const;
 private:
 	static constexpr SDL_Rect src{ 0, 0, 40, 40 };
 	SDL_Texture* texture;
@@ -26,4 +28,5 @@ private:
 	SDL_Rect dir;
 	double angle;
 	SDL_Rect lastDir;
+	int tileSize;
 };

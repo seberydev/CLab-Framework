@@ -2,8 +2,8 @@
 #include "clf.h"
 
 int Map::GetTileSize() { return tileSize; }
-int Map::Width() { return totalTilesX; }
-int Map::Height() { return totalTilesY; }
+int Map::Width() { return totalTilesX - 1; }
+int Map::Height() { return totalTilesY - 1; }
 
 void Map::DrawGrid() {
 	for (int y{ 0 }; y < totalTilesY; ++y) {

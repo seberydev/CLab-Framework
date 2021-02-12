@@ -1,10 +1,13 @@
 #include "Snake.h"
 #include "Map.h"
+#include <iostream>
 
 Snake::Snake()
 	: timerToMove{ 0.5f, 0.0f },
+	  startTimerToMoveDelay{ timerToMove.GetDelay() },
 	  tileSize{ Map::GetTileSize() },
-	  currentBlocks{ 2 },
+	  currentBodyBlocks{ 2 },
+	  startCurrentBodyBlocks{ currentBodyBlocks },
 	  head{ nullptr },
 	  body{ nullptr },
 	  tail{ nullptr } {
@@ -19,17 +22,8 @@ void Snake::Init() {
 
 	//Snake's Head
 	blocks.at(0).Init(head);
-	blocks.at(0).SetPos((Map::Width() / 2) * tileSize, (Map::Height() / 2) * tileSize);
 
-	//Snake's Body
-	for (size_t i{ 1 }; i <= currentBlocks; ++i) {
-		blocks.at(i).Init(body);
-		blocks.at(i).SetPos((Map::Width() / 2) * tileSize, ((Map::Height() / 2) * tileSize) - (tileSize * i));
-	}
-
-	//Snake's Tail
-	blocks.at(currentBlocks + 1).Init(tail);
-	blocks.at(currentBlocks + 1).SetPos((Map::Width() / 2) * tileSize, ((Map::Height() / 2) * tileSize) - (tileSize * (currentBlocks + 1)));
+	Reset();
 }
 
 void Snake::SetDir(const Uint8* keystates) {
@@ -65,12 +59,12 @@ void Snake::Move(float deltaTime) {
 		}
 
 		//Snake's Body and Tail
-		for (size_t i{ currentBlocks + 1 }; i >= 1; --i) {
+		for (size_t i{ currentBodyBlocks + 1 }; i >= 1; --i) {
 			blocks.at(i).SetPos(blocks.at(i - 1).GetPosX(), blocks.at(i - 1).GetPosY());
 		}
 
 		//Snake's Tail angle
-		blocks.at(currentBlocks + 1).SetAngle(TailAngle());
+		blocks.at(currentBodyBlocks + 1).SetAngle(TailAngle());
 
 		//Snake's Head
 		blocks.at(0).SetPos(
@@ -85,7 +79,7 @@ void Snake::Draw() {
 	blocks.at(0).Draw();
 
 	//Snake's Body and Tail
-	for (size_t i{ 1 }; i <= currentBlocks + 1; ++i) {
+	for (size_t i{ 1 }; i <= currentBodyBlocks + 1; ++i) {
 		blocks.at(i).Draw();
 	}
 
@@ -96,7 +90,7 @@ void Snake::Finish() {
 	blocks.at(0).Finish();
 
 	//Snake's Body and Tail
-	for (size_t i{ 1 }; i <= currentBlocks + 1; ++i) {
+	for (size_t i{ 1 }; i <= currentBodyBlocks + 1; ++i) {
 		blocks.at(i).Finish();
 	}
 
@@ -118,10 +112,10 @@ double Snake::HeadAngle() {
 }
 
 double Snake::TailAngle() {
-	int compareX = blocks.at(currentBlocks).GetPosX();
-	int compareY = blocks.at(currentBlocks).GetPosY();
-	int tailX = blocks.at(currentBlocks + 1).GetPosX();
-	int tailY = blocks.at(currentBlocks + 1).GetPosY();
+	int compareX = blocks.at(currentBodyBlocks).GetPosX();
+	int compareY = blocks.at(currentBodyBlocks).GetPosY();
+	int tailX = blocks.at(currentBodyBlocks + 1).GetPosX();
+	int tailY = blocks.at(currentBodyBlocks + 1).GetPosY();
 
 	if (compareY == tailY && compareX < tailX)
 		return 90.0;
@@ -131,5 +125,54 @@ double Snake::TailAngle() {
 		return 180.0;
 	else
 		return 0.0;
+}
+
+const SDL_Rect& Snake::GetHeadPos() const {
+	return blocks.at(0).GetPos();
+}
+
+void Snake::Grow() {
+	//New Tail Block
+	blocks.at(currentBodyBlocks + 2).SetPos(blocks.at(currentBodyBlocks + 1).GetPosX(), blocks.at(currentBodyBlocks + 1).GetPosY());
+	blocks.at(currentBodyBlocks + 2).Init(tail);
+	//New Body Block
+	blocks.at(currentBodyBlocks + 1).Init(body);
+	++currentBodyBlocks;
+	float delay = timerToMove.GetDelay() - 0.01f;
+	timerToMove.SetDelay(delay > 0.1f ? delay : 0.1f);
+}
+
+void Snake::IsGameOver() {
+	if (blocks.at(0).GetPosX() < 0 ||
+		blocks.at(0).GetPosX() > (Map::Width() * Map::GetTileSize()) ||
+		blocks.at(0).GetPosY() < 0 ||
+		blocks.at(0).GetPosY() > (Map::Height() * Map::GetTileSize()))
+		Reset();
+
+	for (size_t i{ 1 }; i <= currentBodyBlocks + 1; ++i) {
+		if (blocks.at(0).IsColliding(blocks.at(i).GetPos()))
+			Reset();
+	}
+}
+
+void Snake::Reset() {
+	currentBodyBlocks = startCurrentBodyBlocks;
+	timerToMove.SetDelay(startTimerToMoveDelay);
+
+	//Reset Head
+	blocks.at(0).SetPos((Map::Width() / 2) * tileSize, (Map::Height() / 2) * tileSize);
+	blocks.at(0).SetDir(0, 1);
+	blocks.at(0).SetAngle(0.0);
+
+	//Reset Body
+	for (size_t i{ 1 }; i <= currentBodyBlocks; ++i) {
+		blocks.at(i).Init(body);
+		blocks.at(i).SetPos((Map::Width() / 2) * tileSize, ((Map::Height() / 2) * tileSize) - (tileSize * i));
+	}
+
+	//Reset Tail
+	blocks.at(currentBodyBlocks + 1).Init(tail);
+	blocks.at(currentBodyBlocks + 1).SetAngle(0.0);
+	blocks.at(currentBodyBlocks + 1).SetPos((Map::Width() / 2) * tileSize, ((Map::Height() / 2) * tileSize) - (tileSize * (currentBodyBlocks + 1)));
 }
 

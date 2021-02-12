@@ -3,6 +3,8 @@
 #include "clf.h"
 #include "Map.h"
 #include "Snake.h"
+#include "Item.h"
+#include "Random.h"
 
 class Game : public clf::Engine {
 public:
@@ -17,4 +19,6 @@ protected:
 private:
 	Map map;
 	Snake snake;
+	Item item;
+	Random random;
 };

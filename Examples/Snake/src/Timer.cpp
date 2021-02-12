@@ -5,6 +5,9 @@ Timer::Timer(float delay, float startTime)
 
 }
 
+void Timer::SetDelay(float delay) { this->delay = delay; }
+float Timer::GetDelay() const { return delay; }
+
 bool Timer::Timing(float deltaTime) {
 	counter += deltaTime;
 

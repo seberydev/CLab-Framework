@@ -100,9 +100,11 @@ bool clf::Engine::Initialize(const char* title, size_t screenWidth, size_t scree
 		return false;
 
 	//Set Window Icon
-	SDL_Surface* icon{ IMG_Load(iconPath) };
-	SDL_SetWindowIcon(window, icon);
-	SDL_FreeSurface(icon);
+	if (iconPath) {
+		SDL_Surface* icon{ IMG_Load(iconPath) };
+		SDL_SetWindowIcon(window, icon);
+		SDL_FreeSurface(icon);
+	}
 
 	isRunning = true;
 
