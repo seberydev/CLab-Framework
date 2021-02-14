@@ -60,6 +60,10 @@ namespace clf {
 		static int GetTextureHeight(SDL_Texture* texture);
 		static SDL_Rect GetRectCenter(const SDL_Rect& topLeft);
 		static SDL_Rect GetRectTopLeft(const SDL_Rect& center);
+		static SDL_Point GetPointCenter(const SDL_Point& topLeft, int size);
+		static SDL_Point GetPointTopLeft(const SDL_Point& center, int size);
+		static SDL_FPoint GetPointCenter(const SDL_FPoint& topLeft, float size);
+		static SDL_FPoint GetPointTopLeft(const SDL_FPoint& center, float size);
 	};
 
 	// ----------------------------------------------------------------
@@ -116,11 +120,17 @@ namespace clf {
 		static void DrawRect(const SDL_Rect& topLeft, const SDL_Color& color);
 		static void DrawRectCenter(const SDL_Rect& center, const SDL_Color& color);
 		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
-		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
-		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
-		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_RendererFlip& flip);
-		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);
-		static void DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip);
+		static void DrawFillCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color);
+		static void DrawCircle(const SDL_FPoint& topLeft, float radius, const SDL_Color& color);
+		static void DrawCircleCenter(const SDL_FPoint& center, float radius, const SDL_Color& color);
+		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft);
+		static void DrawSpriteCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center);
+		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip);
+		static void DrawSpriteRotCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip);
+		static void DrawText(SDL_Texture* texture, const SDL_Rect& topLeft);
+		static void DrawTextCenter(SDL_Texture* texture, const SDL_Rect& center);
+		static void DrawTextRot(SDL_Texture* texture, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip);
+		static void DrawTextRotCenter(SDL_Texture* texture, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip);
 	};
 
 	// ----------------------------------------------------------------

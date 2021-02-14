@@ -136,6 +136,22 @@ SDL_Rect clf::Info::GetRectTopLeft(const SDL_Rect& center) {
 	return { center.x - center.w / 2, center.y - center.h / 2, center.w, center.h };
 }
 
+SDL_Point clf::Info::GetPointCenter(const SDL_Point& topLeft, int size) {
+	return { topLeft.x + size / 2, topLeft.y + size / 2 };
+}
+
+SDL_Point clf::Info::GetPointTopLeft(const SDL_Point& center, int size) {
+	return { center.x - size / 2, center.y - size / 2 };
+}
+
+SDL_FPoint clf::Info::GetPointCenter(const SDL_FPoint& topLeft, float size) {
+	return { topLeft.x + size / 2, topLeft.y + size / 2 };
+}
+
+SDL_FPoint clf::Info::GetPointTopLeft(const SDL_FPoint& center, float size) {
+	return { center.x - size / 2, center.y - size / 2 };
+}
+
 // ----------------------------------------------------------------
 // - clf::Asset Implementation                                    -
 // ----------------------------------------------------------------
@@ -235,7 +251,11 @@ void clf::Render::DrawRectCenter(const SDL_Rect& center, const SDL_Color& color)
 	DrawRect(clf::Info::GetRectTopLeft(center), color);
 }
 
-void clf::Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
+void clf::Render::DrawCircle(const SDL_FPoint& topLeft, float radius, const SDL_Color& color) {
+	DrawCircleCenter(clf::Info::GetPointCenter(topLeft, radius * 2), radius, color);
+}
+
+void clf::Render::DrawCircleCenter(const SDL_FPoint& center, float radius, const SDL_Color& color) {
 	const double PI = 3.1415926535;
 	double x1{ 0.0 }, y1{ 0.0 };
 
@@ -244,24 +264,28 @@ void clf::Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL
 		y1 = radius * sin(angle * PI / 180.0);
 
 		SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
-		SDL_RenderDrawPointF(clf::Engine::GetRenderer(), static_cast<float>(topLeft.x + x1), static_cast<float>(topLeft.y + y1));
+		SDL_RenderDrawPointF(clf::Engine::GetRenderer(), static_cast<float>(center.x + x1), static_cast<float>(center.y + y1));
 	}
 }
 
 void clf::Render::DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
-	int maxX{ topLeft.x + (radius * 2) - 1 }, maxY{ topLeft.y + (radius * 2) - 1 };
+	int maxX{ topLeft.x + (radius * 2) - 1 }, maxY{ topLeft.y + (radius * 2)- 1 };
 	int squaredRadius{ radius * radius };
 	int cX{ topLeft.x + radius }, cY{ topLeft.y + radius };
 
 	for (int y{ topLeft.y + 1 }; y <= maxY; ++y) {
-		for (int x{ topLeft.x + 1 }; x <= maxX; ++x) {
+		for (int x{ topLeft.x + 1  }; x <= maxX; ++x) {
 			int distance = ((x - cX) * (x - cX)) + ((y - cY) * (y - cY));
 			if (distance <= squaredRadius) {
 				SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
-				SDL_RenderDrawPoint(clf::Engine::GetRenderer(), x, y);
+				SDL_RenderDrawPoint(clf::Engine::GetRenderer(), x - 1, y - 1);
 			}
 		}
 	}
+}
+
+void clf::Render::DrawFillCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color) {
+	DrawFillCircle(clf::Info::GetPointTopLeft(center, radius * 2), radius, color);
 }
 
 void clf::Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
@@ -280,20 +304,36 @@ void clf::Render::DrawTriangleCenter(const SDL_Point& center, size_t distance, c
 		color);
 }
 
-void clf::Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
-	DrawSpriteRot(texture, source, destination, 0.0, SDL_FLIP_NONE);
+void clf::Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft) {
+	DrawSpriteRot(texture, source, topLeft, 0.0, SDL_FLIP_NONE);
 }
 
-void clf::Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_RendererFlip& flip) {
-	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, &source, &destination, angle, nullptr, flip);
+void clf::Render::DrawSpriteCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center) {
+	DrawSprite(texture, source, clf::Info::GetRectTopLeft(center));
 }
 
-void clf::Render::DrawText(SDL_Texture* texture, const SDL_Rect& destination) {
-	DrawTextRot(texture, destination, 0.0, nullptr, SDL_FLIP_NONE);
+void clf::Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip) {
+	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, &source, &topLeft, angle, nullptr, flip);
 }
 
-void clf::Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& destination, const double angle, const SDL_Point* center, const SDL_RendererFlip& flip) {
-	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, nullptr, &destination, angle, center, flip);
+void clf::Render::DrawSpriteRotCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip) {
+	DrawSpriteRot(texture, source, clf::Info::GetRectTopLeft(center), angle, flip);
+}
+
+void clf::Render::DrawText(SDL_Texture* texture, const SDL_Rect& topLeft) {
+	SDL_RenderCopy(clf::Engine::GetRenderer(), texture, nullptr, &topLeft);
+}
+
+void clf::Render::DrawTextCenter(SDL_Texture* texture, const SDL_Rect& center) {
+	DrawText(texture, clf::Info::GetRectTopLeft(center));
+}
+
+void clf::Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip) {
+	SDL_RenderCopyEx(clf::Engine::GetRenderer(), texture, nullptr, &topLeft, angle, nullptr, flip);
+}
+
+void clf::Render::DrawTextRotCenter(SDL_Texture* texture, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip) {
+	DrawTextRot(texture, clf::Info::GetRectTopLeft(center), angle, flip);
 }
 
 // ----------------------------------------------------------------
