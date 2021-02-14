@@ -128,6 +128,14 @@ int clf::Info::GetTextureHeight(SDL_Texture* texture) {
 	return height;
 }
 
+SDL_Rect clf::Info::GetRectCenter(const SDL_Rect& topLeft) {
+	return { topLeft.x + topLeft.w / 2, topLeft.y + topLeft.h / 2, topLeft.w, topLeft.h };
+}
+
+SDL_Rect clf::Info::GetRectTopLeft(const SDL_Rect& center) {
+	return { center.x - center.w / 2, center.y - center.h / 2, center.w, center.h };
+}
+
 // ----------------------------------------------------------------
 // - clf::Asset Implementation                                    -
 // ----------------------------------------------------------------
@@ -209,14 +217,22 @@ void clf::Render::DrawLine(const SDL_Point& start, const SDL_Point& end, const S
 	SDL_RenderDrawLine(clf::Engine::GetRenderer(), start.x, start.y, end.x, end.y);
 }
 
-void clf::Render::DrawFillRect(const SDL_Rect& destination, const SDL_Color& color) {
+void clf::Render::DrawFillRect(const SDL_Rect& topLeft, const SDL_Color& color) {
 	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
-	SDL_RenderFillRect(clf::Engine::GetRenderer(), &destination);
+	SDL_RenderFillRect(clf::Engine::GetRenderer(), &topLeft);
 }
 
-void clf::Render::DrawRect(const SDL_Rect& destination, const SDL_Color& color) {
+void clf::Render::DrawFillRectCenter(const SDL_Rect& center, const SDL_Color& color) {
+	DrawFillRect(clf::Info::GetRectTopLeft(center), color);
+}
+
+void clf::Render::DrawRect(const SDL_Rect& topLeft, const SDL_Color& color) {
 	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
-	SDL_RenderDrawRect(clf::Engine::GetRenderer(), &destination);
+	SDL_RenderDrawRect(clf::Engine::GetRenderer(), &topLeft);
+}
+
+void clf::Render::DrawRectCenter(const SDL_Rect& center, const SDL_Color& color) {
+	DrawRect(clf::Info::GetRectTopLeft(center), color);
 }
 
 void clf::Render::DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color) {
