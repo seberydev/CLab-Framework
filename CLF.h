@@ -108,10 +108,11 @@ namespace clf {
 		static void Clear(const SDL_Color& color);
 		static void DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
+		static void DrawTriangleCenter(const SDL_Point& center, size_t distance, const SDL_Color& color);
 		static void DrawFillRect(const SDL_Rect& destination, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& destination, const SDL_Color& color);
-		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
 		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
+		static void DrawCircle(const SDL_FPoint& topLeft, double radius, const SDL_Color& color);
 		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination);
 		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination, const double angle, const SDL_RendererFlip& flip);
 		static void DrawText(SDL_Texture* texture, const SDL_Rect& destination);

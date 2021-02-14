@@ -255,6 +255,15 @@ void clf::Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const S
 	SDL_RenderDrawLines(clf::Engine::GetRenderer(), vertices, 4);
 }
 
+void clf::Render::DrawTriangleCenter(const SDL_Point& center, size_t distance, const SDL_Color& color) {
+	int d = static_cast<int>(distance) - 1;
+	DrawTriangle(
+		{ center.x, center.y - d }, 
+		{ center.x - d, center.y + d },
+		{ center.x + d, center.y + d },
+		color);
+}
+
 void clf::Render::DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& destination) {
 	DrawSpriteRot(texture, source, destination, 0.0, SDL_FLIP_NONE);
 }
