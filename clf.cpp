@@ -161,6 +161,97 @@ SDL_FPoint clf::Info::GetPointTopLeftF(const SDL_FPoint& center, float size) {
 }
 
 // ----------------------------------------------------------------
+// - clf::Sprite Implementation                                   -
+// ----------------------------------------------------------------
+//Constructor
+clf::Sprite::Sprite() : 
+	source{ 0, 0, 0, 0 },
+	destination{ 0.0f, 0.0f, 0.0f, 0.0f },
+	texture{ nullptr },
+	flip{ SDL_FLIP_NONE },
+	angle{ 0.0f } {
+
+}
+
+//Methods
+void clf::Sprite::OnStart(
+	int srcX, int srcY, int srcW, int srcH,
+	float dstX, float dstY, float dstW, float dstH,
+	const char* filepath, const SDL_RendererFlip& flip, double angle) {
+
+	source = { srcX, srcY, srcW, srcH };
+	destination = { dstX, dstY, dstW, dstH };
+	texture = clf::Asset::LoadSprite(filepath);
+	this->angle = angle;
+	this->flip = flip;
+}
+
+void clf::Sprite::Draw() {
+	clf::Render::DrawSpriteRotCenterF(texture, source, destination, angle, flip);
+}
+
+void clf::Sprite::OnFinish() {
+	clf::Asset::FreeTexture(texture);
+}
+
+//Getters and Setters
+//Source Member
+const SDL_Rect& clf::Sprite::GetSrc() const { return source; }
+int clf::Sprite::GetSrcX() const { return source.x; }
+int clf::Sprite::GetSrcY() const { return source.y; };
+int clf::Sprite::GetSrcW() const { return source.w; };
+int clf::Sprite::GetSrcH() const { return source.h; };
+
+void clf::Sprite::SetSrc(int sourceX, int sourceY, int sourceW, int sourceH) {
+	source.x = sourceX;
+	source.y = sourceY;
+	source.w = sourceW;
+	source.h = sourceH;
+}
+
+void clf::Sprite::SetSrcX(int sourceX) { source.x = sourceX; }
+void clf::Sprite::SetSrcY(int sourceY) { source.y = sourceY; };
+void clf::Sprite::SetSrcW(int sourceW) { source.w = sourceW; };
+void clf::Sprite::SetSrcH(int sourceH) { source.h = sourceH; };
+
+//Destination Member
+const SDL_FRect& clf::Sprite::GetDst() const { return destination; }
+float clf::Sprite::GetDstX() const { return destination.x; }
+float clf::Sprite::GetDstY() const { return destination.y; }
+float clf::Sprite::GetDstW() const { return destination.w; }
+float clf::Sprite::GetDstH() const { return destination.h; }
+
+void clf::Sprite::SetDst(float destinationX, float destinationY, float destinationW, float destinationH) {
+	destination.x = destinationX;
+	destination.y = destinationY;
+	destination.w = destinationW;
+	destination.h = destinationH;
+}
+
+void clf::Sprite::SetDstX(float destinationX) { destination.x = destinationX; }
+void clf::Sprite::SetDstY(float destinationY) { destination.y = destinationY; }
+void clf::Sprite::SetDstW(float destinationW) { destination.w = destinationW; }
+void clf::Sprite::SetDstH(float destinationH) { destination.h = destinationH; }
+
+//Texture Member
+//Be Careful with THIS!!
+SDL_Texture* clf::Sprite::GetTexture() const { return texture; }
+void clf::Sprite::SetTexture(SDL_Texture* texture) { 
+	if (this->texture)
+		clf::Asset::FreeTexture(this->texture);
+
+	this->texture = nullptr;
+	this->texture = texture;
+}
+
+//Flip Member
+void clf::Sprite::SetFlip(const SDL_RendererFlip& flip) { this->flip = flip; }
+
+//Angle Member
+double clf::Sprite::GetAngle() const { return angle; }
+void clf::Sprite::SetAngle(double angle) { this->angle = angle; }
+
+// ----------------------------------------------------------------
 // - clf::Asset Implementation                                    -
 // ----------------------------------------------------------------
 SDL_Texture* clf::Asset::LoadSprite(const char* filepath) {

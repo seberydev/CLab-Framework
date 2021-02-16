@@ -69,6 +69,61 @@ namespace clf {
 	};
 
 	// ----------------------------------------------------------------
+	// - Sprite Specification                                         -
+	// ----------------------------------------------------------------
+	class Sprite {
+	public:
+		Sprite();
+		~Sprite() = default;
+	public:
+		void OnStart(
+			int srcX, int srcY, int srcW, int srcH,
+			float dstX, float dstY, float dstW, float dstH,
+			const char* filepath, const SDL_RendererFlip& flip, double angle);
+		void Draw();
+		void OnFinish();
+	public:
+		//Getters and Setters
+		//Source Member
+		const SDL_Rect& GetSrc() const;
+		int GetSrcX() const;
+		int GetSrcY() const;
+		int GetSrcW() const;
+		int GetSrcH() const;
+		void SetSrc(int sourceX, int sourceY, int sourceW, int sourceH);
+		void SetSrcX(int sourceX);
+		void SetSrcY(int sourceY);
+		void SetSrcW(int sourceW);
+		void SetSrcH(int sourceH);
+		//Destination Member
+		const SDL_FRect& GetDst() const;
+		float GetDstX() const;
+		float GetDstY() const;
+		float GetDstW() const;
+		float GetDstH() const;
+		void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
+		void SetDstX(float destinationX);
+		void SetDstY(float destinationY);
+		void SetDstW(float destinationW);
+		void SetDstH(float destinationH);
+		//Texture Member
+		//Be Careful with THIS!!
+		SDL_Texture* GetTexture() const;
+		void SetTexture(SDL_Texture* texture);
+		//Flip Member
+		void SetFlip(const SDL_RendererFlip& flip);
+		//Angle Member
+		double GetAngle() const;
+		void SetAngle(double angle);
+	private:
+		SDL_Rect source;
+		SDL_FRect destination;
+		SDL_Texture* texture;
+		SDL_RendererFlip flip;
+		double angle;
+	};
+
+	// ----------------------------------------------------------------
 	// - Color Constants		                                      -
 	// ----------------------------------------------------------------
 	class Color {
