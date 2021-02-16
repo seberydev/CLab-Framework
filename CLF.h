@@ -59,11 +59,13 @@ namespace clf {
 		static int GetTextureWidth(SDL_Texture* texture);
 		static int GetTextureHeight(SDL_Texture* texture);
 		static SDL_Rect GetRectCenter(const SDL_Rect& topLeft);
+		static SDL_FRect GetRectCenterF(const SDL_FRect& topLeft);
 		static SDL_Rect GetRectTopLeft(const SDL_Rect& center);
+		static SDL_FRect GetRectTopLeftF(const SDL_FRect& center);
 		static SDL_Point GetPointCenter(const SDL_Point& topLeft, int size);
+		static SDL_FPoint GetPointCenterF(const SDL_FPoint& topLeft, float size);
 		static SDL_Point GetPointTopLeft(const SDL_Point& center, int size);
-		static SDL_FPoint GetPointCenter(const SDL_FPoint& topLeft, float size);
-		static SDL_FPoint GetPointTopLeft(const SDL_FPoint& center, float size);
+		static SDL_FPoint GetPointTopLeftF(const SDL_FPoint& center, float size);
 	};
 
 	// ----------------------------------------------------------------
@@ -113,24 +115,43 @@ namespace clf {
 	public:
 		static void Clear(const SDL_Color& color);
 		static void DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color);
+		static void DrawLineF(const SDL_FPoint& start, const SDL_FPoint& end, const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);
-		static void DrawTriangleCenter(const SDL_Point& center, size_t distance, const SDL_Color& color);
+		static void DrawTriangleF(const SDL_FPoint& v1, const SDL_FPoint& v2, const SDL_FPoint& v3, const SDL_Color& color);
+		static void DrawTriangleCenter(const SDL_Point& center, int distance, const SDL_Color& color);
+		static void DrawTriangleCenterF(const SDL_FPoint& center, float distance, const SDL_Color& color);
 		static void DrawFillRect(const SDL_Rect& topLeft, const SDL_Color& color);
+		static void DrawFillRectF(const SDL_FRect& topLeft, const SDL_Color& color);
 		static void DrawFillRectCenter(const SDL_Rect& center, const SDL_Color& color);
+		static void DrawFillRectCenterF(const SDL_FRect& center, const SDL_Color& color);
 		static void DrawRect(const SDL_Rect& topLeft, const SDL_Color& color);
+		static void DrawRectF(const SDL_FRect& topLeft, const SDL_Color& color);
 		static void DrawRectCenter(const SDL_Rect& center, const SDL_Color& color);
+		static void DrawRectCenterF(const SDL_FRect& center, const SDL_Color& color);
 		static void DrawFillCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
+		static void DrawFillCircleF(const SDL_FPoint& topLeft, float radius, const SDL_Color& color);
 		static void DrawFillCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color);
-		static void DrawCircle(const SDL_FPoint& topLeft, float radius, const SDL_Color& color);
-		static void DrawCircleCenter(const SDL_FPoint& center, float radius, const SDL_Color& color);
+		static void DrawFillCircleCenterF(const SDL_FPoint& center, float radius, const SDL_Color& color);
+		static void DrawCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color);
+		static void DrawCircleF(const SDL_FPoint& topLeft, float radius, const SDL_Color& color);
+		static void DrawCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color);
+		static void DrawCircleCenterF(const SDL_FPoint& center, float radius, const SDL_Color& color);
 		static void DrawSprite(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft);
+		static void DrawSpriteF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& topLeft);
 		static void DrawSpriteCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center);
+		static void DrawSpriteCenterF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& center);
 		static void DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip);
+		static void DrawSpriteRotF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& topLeft, const double angle, const SDL_RendererFlip& flip);
 		static void DrawSpriteRotCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip);
+		static void DrawSpriteRotCenterF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& center, const double angle, const SDL_RendererFlip& flip);
 		static void DrawText(SDL_Texture* texture, const SDL_Rect& topLeft);
+		static void DrawTextF(SDL_Texture* texture, const SDL_FRect& topLeft);
 		static void DrawTextCenter(SDL_Texture* texture, const SDL_Rect& center);
+		static void DrawTextCenterF(SDL_Texture* texture, const SDL_FRect& center);
 		static void DrawTextRot(SDL_Texture* texture, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip);
+		static void DrawTextRotF(SDL_Texture* texture, const SDL_FRect& topLeft, const double angle, const SDL_RendererFlip& flip);
 		static void DrawTextRotCenter(SDL_Texture* texture, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip);
+		static void DrawTextRotCenterF(SDL_Texture* texture, const SDL_FRect& center, const double angle, const SDL_RendererFlip& flip);
 	};
 
 	// ----------------------------------------------------------------
