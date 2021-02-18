@@ -57,7 +57,9 @@ namespace clf {
 		~Info() = default;
 	public:
 		static int GetTextureWidth(SDL_Texture* texture);
+		static float GetTextureWidthF(SDL_Texture* texture);
 		static int GetTextureHeight(SDL_Texture* texture);
+		static float GetTextureHeightF(SDL_Texture* texture);
 		static SDL_Rect GetRectCenter(const SDL_Rect& topLeft);
 		static SDL_FRect GetRectCenterF(const SDL_FRect& topLeft);
 		static SDL_Rect GetRectTopLeft(const SDL_Rect& center);
@@ -121,6 +123,59 @@ namespace clf {
 		SDL_Texture* texture;
 		SDL_RendererFlip flip;
 		double angle;
+	};
+
+	// ----------------------------------------------------------------
+	// - Text Specification                                           -
+	// ----------------------------------------------------------------
+	class Text {
+	public:
+		Text();
+		~Text() = default;
+	public:
+		void OnStart(float x, float y, const char* filepath, const char* text, int size, const SDL_Color& color, int outline, int style);
+		void Draw();
+		void OnFinish();
+	public:
+		//Getters and Setters
+		//Texture Member
+		//Be Careful with THIS!!
+		SDL_Texture* GetTexture() const;
+		void SetTexture(SDL_Texture* texture);
+		//Text Member
+		const char* GetText() const;
+		void SetText(const char* text);
+		//Filepath Member
+		const char* GetFilepath() const;
+		void SetFilepath(const char* filepath);
+		//Destination Member
+		const SDL_FRect& GetDst() const;
+		float GetDstX() const;
+		float GetDstY() const;
+		float GetDstW() const;
+		float GetDstH() const;
+		void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
+		void SetDstX(float destinationX);
+		void SetDstY(float destinationY);
+		void SetDstW(float destinationW);
+		void SetDstH(float destinationH);
+		//Color Member
+		const SDL_Color& GetColor() const;
+		void SetColor(const SDL_Color& color);
+		//Font Style Members
+		int GetSize() const;
+		void SetSize(int size);
+		int GetOutline() const;
+		void SetOutline(int outline);
+		int GetStyle() const;
+		void SetStyle(int style);
+	private:
+		SDL_Texture* texture;
+		const char* text;
+		const char* filepath;
+		SDL_FRect destination;
+		SDL_Color color;
+		int size, outline, style;
 	};
 
 	// ----------------------------------------------------------------
