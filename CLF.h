@@ -170,12 +170,67 @@ namespace clf {
 		int GetStyle() const;
 		void SetStyle(int style);
 	private:
+		void ReloadTexture();
 		SDL_Texture* texture;
 		const char* text;
 		const char* filepath;
 		SDL_FRect destination;
 		SDL_Color color;
 		int size, outline, style;
+	};
+
+	// ----------------------------------------------------------------
+	// - Sfx Specification                                            - 
+	// ----------------------------------------------------------------
+	class Sfx {
+	public:
+		Sfx();
+		~Sfx() = default;
+	public:
+		void OnStart(const char* filepath, int channel, size_t volume);
+		void OnFinish();
+	public:
+		//Getters and Setters
+		//Sound Member
+		Mix_Chunk* GetSound() const;
+		void SetSound(Mix_Chunk* sound);
+		//Filepath Member
+		const char* GetFilepath() const;
+		void SetFilepath(const char* filepath);
+		//Channel Member
+		int GetChannel() const;
+		void SetChannel(int channel);
+		//Volume Member
+		size_t GetVolume() const;
+		void SetVolume(size_t volume);
+	private:
+		Mix_Chunk* sound;
+		const char* filepath;
+		int channel;
+		size_t volume;
+	};
+
+	// ----------------------------------------------------------------
+	// - Music Specification                                          - 
+	// ----------------------------------------------------------------
+	class Music {
+	public:
+		Music();
+		~Music() = default;
+	public:
+		void OnStart(const char* filepath);
+		void OnFinish();
+	public:
+		//Getters and Setters
+		//Music Member
+		Mix_Music* GetMusic() const;
+		void SetMusic(Mix_Music* music);
+		//Filepath Member
+		const char* GetFilepath() const;
+		void SetFilepath(const char* filepath);
+	private:
+		Mix_Music* music;
+		const char* filepath;
 	};
 
 	// ----------------------------------------------------------------

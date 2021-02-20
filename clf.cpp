@@ -293,6 +293,13 @@ void clf::Text::OnFinish() {
 	clf::Asset::FreeTexture(texture);
 }
 
+void clf::Text::ReloadTexture() {
+	if (this->texture)
+		clf::Asset::FreeTexture(texture);
+
+	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+}
+
 //Getters and Setters
 //Texture Member
 //Be Careful with THIS!!
@@ -312,7 +319,7 @@ void clf::Text::SetText(const char* text) {
 		clf::Asset::FreeTexture(this->texture);
 
 	this->text = text;
-	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+	ReloadTexture();
 	destination.w = clf::Info::GetTextureWidthF(texture);
 	destination.h = clf::Info::GetTextureHeightF(texture);
 }
@@ -320,7 +327,14 @@ void clf::Text::SetText(const char* text) {
 //Filepath Member
 const char* clf::Text::GetFilepath() const { return filepath; }
 
-void clf::Text::SetFilepath(const char* filepath) { this->filepath = filepath; }
+void clf::Text::SetFilepath(const char* filepath) { 
+	if (strcmp(this->filepath, filepath) == 0)
+		return;
+
+	this->filepath = filepath; 
+
+	ReloadTexture();
+}
 
 //Destination Member
 const SDL_FRect& clf::Text::GetDst() const { return destination; }
@@ -347,12 +361,9 @@ const SDL_Color& clf::Text::GetColor() const { return color; }
 void clf::Text::SetColor(const SDL_Color& color) {
 	if (this->color.r == color.r && this->color.g == color.g && this->color.b == color.b && this->color.a == color.a)
 		return;
-		
-	if (this->texture)
-		clf::Asset::FreeTexture(this->texture);
 
 	this->color = color;
-	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+	ReloadTexture();
 }
 
 //Font Style Members
@@ -363,7 +374,8 @@ void clf::Text::SetSize(int size) {
 		return;
 
 	this->size = size;
-	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+
+	ReloadTexture();
 	destination.w = clf::Info::GetTextureWidthF(texture);
 	destination.h = clf::Info::GetTextureHeightF(texture);
 }
@@ -375,7 +387,7 @@ void clf::Text::SetOutline(int outline) {
 		return;
 
 	this->outline = outline;
-	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+	ReloadTexture();
 }
 
 int clf::Text::GetStyle() const { return style; }
@@ -385,9 +397,110 @@ void clf::Text::SetStyle(int style) {
 		return;
 
 	this->style = style;
-	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
+	ReloadTexture();
 	destination.w = clf::Info::GetTextureWidthF(texture);
 	destination.h = clf::Info::GetTextureHeightF(texture);
+}
+
+// ----------------------------------------------------------------
+// - Sfx Implementation                                           - 
+// ----------------------------------------------------------------
+//Constructor
+clf::Sfx::Sfx() :
+	sound{ nullptr },
+	filepath{ nullptr },
+	channel{ -1 },
+	volume{ 128 } {
+
+}
+
+//Methods
+void clf::Sfx::OnStart(const char* filepath, int channel, size_t volume) {
+	this->filepath = filepath;
+	this->channel = channel;
+	this->volume = volume;
+
+	sound = clf::Asset::LoadSound(filepath);
+}
+
+void clf::Sfx::OnFinish() {
+	clf::Asset::FreeSound(sound);
+}
+
+//Getters and Setters
+Mix_Chunk* clf::Sfx::GetSound() const { return sound; }
+
+void clf::Sfx::SetSound(Mix_Chunk* sound) { 
+	if (sound)
+		clf::Asset::FreeSound(sound);
+
+	this->sound = sound;
+}
+
+//Filepath Member
+const char* clf::Sfx::GetFilepath() const { return filepath; }
+
+void clf::Sfx::SetFilepath(const char* filepath) {
+	if (strcmp(this->filepath, filepath) == 0)
+		return;
+
+	this->filepath = filepath;
+
+	if (sound)
+		clf::Asset::FreeSound(sound);
+
+	sound = clf::Asset::LoadSound(filepath);
+}
+
+//Channel Member
+int clf::Sfx::GetChannel() const { return channel; }
+void clf::Sfx::SetChannel(int channel) { this->channel = channel; }
+
+//Volume Member
+size_t clf::Sfx::GetVolume() const { return volume; }
+void clf::Sfx::SetVolume(size_t volume) { this->volume = volume; }
+
+// ----------------------------------------------------------------
+// - Music Implementation                                         - 
+// ----------------------------------------------------------------
+clf::Music::Music() :
+	music{ nullptr },
+	filepath{ nullptr } {
+
+}
+
+//Methods
+void clf::Music::OnStart(const char* filepath) {
+	this->filepath = filepath;
+	music = clf::Asset::LoadMusic(filepath);
+}
+
+void clf::Music::OnFinish() {
+	clf::Asset::FreeMusic(music);
+}
+
+//Getters and Setters
+//Music Member
+Mix_Music* clf::Music::GetMusic() const { return music; }
+void clf::Music::SetMusic(Mix_Music* music) {
+	if (this->music)
+		clf::Asset::FreeMusic(this->music);
+
+	this->music = music;
+}
+
+//Filepath Member
+const char* clf::Music::GetFilepath() const { return filepath; }
+
+void clf::Music::SetFilepath(const char* filepath) {
+	if (strcmp(this->filepath, filepath) == 0)
+		return;
+
+	if (this->music)
+		clf::Asset::FreeMusic(this->music);
+
+	this->filepath = filepath;
+	music = clf::Asset::LoadMusic(filepath);
 }
 
 // ----------------------------------------------------------------
