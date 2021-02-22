@@ -112,67 +112,67 @@ bool clf::Engine::Initialize(const char* title, size_t screenWidth, size_t scree
 }
 
 // ----------------------------------------------------------------
-// - clf::Info Implementation                                     -
+// - clf::Utilities::Info Implementation                                     -
 // ----------------------------------------------------------------
-int clf::Info::GetTextureWidth(SDL_Texture* texture) {
+int clf::Utilities::Info::GetTextureWidth(SDL_Texture* texture) {
 	int width{ 0 };
 	SDL_QueryTexture(texture, NULL, NULL, &width, nullptr);
 
 	return width;
 }
 
-float clf::Info::GetTextureWidthF(SDL_Texture* texture) {
+float clf::Utilities::Info::GetTextureWidthF(SDL_Texture* texture) {
 	return static_cast<float>(GetTextureWidth(texture));
 }
 
-int clf::Info::GetTextureHeight(SDL_Texture* texture) {
+int clf::Utilities::Info::GetTextureHeight(SDL_Texture* texture) {
 	int height{ 0 };
 	SDL_QueryTexture(texture, NULL, NULL, nullptr, &height);
 
 	return height;
 }
 
-float clf::Info::GetTextureHeightF(SDL_Texture* texture) {
+float clf::Utilities::Info::GetTextureHeightF(SDL_Texture* texture) {
 	return static_cast<float>(GetTextureHeight(texture));
 }
 
-SDL_Rect clf::Info::GetRectCenter(const SDL_Rect& topLeft) {
+SDL_Rect clf::Utilities::Info::GetRectCenter(const SDL_Rect& topLeft) {
 	return { topLeft.x + topLeft.w / 2, topLeft.y + topLeft.h / 2, topLeft.w, topLeft.h };
 }
 
-SDL_FRect clf::Info::GetRectCenterF(const SDL_FRect& topLeft) {
+SDL_FRect clf::Utilities::Info::GetRectCenterF(const SDL_FRect& topLeft) {
 	return { topLeft.x + topLeft.w / 2.0f, topLeft.y + topLeft.h / 2.0f, topLeft.w, topLeft.h };
 }
 
-SDL_Rect clf::Info::GetRectTopLeft(const SDL_Rect& center) {
+SDL_Rect clf::Utilities::Info::GetRectTopLeft(const SDL_Rect& center) {
 	return { center.x - center.w / 2, center.y - center.h / 2, center.w, center.h };
 }
 
-SDL_FRect clf::Info::GetRectTopLeftF(const SDL_FRect& center) {
+SDL_FRect clf::Utilities::Info::GetRectTopLeftF(const SDL_FRect& center) {
 	return { center.x - center.w / 2.0f, center.y - center.h / 2.0f, center.w, center.h };
 }
 
-SDL_Point clf::Info::GetPointCenter(const SDL_Point& topLeft, int size) {
+SDL_Point clf::Utilities::Info::GetPointCenter(const SDL_Point& topLeft, int size) {
 	return { topLeft.x + size / 2, topLeft.y + size / 2 };
 }
 
-SDL_FPoint clf::Info::GetPointCenterF(const SDL_FPoint& topLeft, float size) {
+SDL_FPoint clf::Utilities::Info::GetPointCenterF(const SDL_FPoint& topLeft, float size) {
 	return { topLeft.x + size / 2.0f, topLeft.y + size / 2.0f };
 }
 
-SDL_Point clf::Info::GetPointTopLeft(const SDL_Point& center, int size) {
+SDL_Point clf::Utilities::Info::GetPointTopLeft(const SDL_Point& center, int size) {
 	return { center.x - size / 2, center.y - size / 2 };
 }
 
-SDL_FPoint clf::Info::GetPointTopLeftF(const SDL_FPoint& center, float size) {
+SDL_FPoint clf::Utilities::Info::GetPointTopLeftF(const SDL_FPoint& center, float size) {
 	return { center.x - size / 2.0f, center.y - size / 2.0f };
 }
 
 // ----------------------------------------------------------------
-// - clf::Sprite Implementation                                   -
+// - clf::Utilities::Sprite Implementation                                   -
 // ----------------------------------------------------------------
 //Constructor
-clf::Sprite::Sprite() : 
+clf::Utilities::Sprite::Sprite() : 
 	source{ 0, 0, 0, 0 },
 	destination{ 0.0f, 0.0f, 0.0f, 0.0f },
 	texture{ nullptr },
@@ -182,7 +182,7 @@ clf::Sprite::Sprite() :
 }
 
 //Methods
-void clf::Sprite::OnStart(
+void clf::Utilities::Sprite::OnStart(
 	int srcX, int srcY, int srcW, int srcH,
 	float dstX, float dstY, float dstW, float dstH,
 	const char* filepath, const SDL_RendererFlip& flip, double angle) {
@@ -194,58 +194,58 @@ void clf::Sprite::OnStart(
 	this->flip = flip;
 }
 
-void clf::Sprite::Draw() {
+void clf::Utilities::Sprite::Draw() {
 	clf::Render::DrawSpriteRotCenterF(texture, source, destination, angle, flip);
 }
 
-void clf::Sprite::OnFinish() {
+void clf::Utilities::Sprite::OnFinish() {
 	clf::Asset::FreeTexture(texture);
 }
 
 //Getters and Setters
 //Source Member
-const SDL_Rect& clf::Sprite::GetSrc() const { return source; }
-int clf::Sprite::GetSrcX() const { return source.x; }
-int clf::Sprite::GetSrcY() const { return source.y; };
-int clf::Sprite::GetSrcW() const { return source.w; };
-int clf::Sprite::GetSrcH() const { return source.h; };
+const SDL_Rect& clf::Utilities::Sprite::GetSrc() const { return source; }
+int clf::Utilities::Sprite::GetSrcX() const { return source.x; }
+int clf::Utilities::Sprite::GetSrcY() const { return source.y; };
+int clf::Utilities::Sprite::GetSrcW() const { return source.w; };
+int clf::Utilities::Sprite::GetSrcH() const { return source.h; };
 
-void clf::Sprite::SetSrc(int sourceX, int sourceY, int sourceW, int sourceH) {
+void clf::Utilities::Sprite::SetSrc(int sourceX, int sourceY, int sourceW, int sourceH) {
 	source.x = sourceX;
 	source.y = sourceY;
 	source.w = sourceW;
 	source.h = sourceH;
 }
 
-void clf::Sprite::SetSrcX(int sourceX) { source.x = sourceX; }
-void clf::Sprite::SetSrcY(int sourceY) { source.y = sourceY; };
-void clf::Sprite::SetSrcW(int sourceW) { source.w = sourceW; };
-void clf::Sprite::SetSrcH(int sourceH) { source.h = sourceH; };
+void clf::Utilities::Sprite::SetSrcX(int sourceX) { source.x = sourceX; }
+void clf::Utilities::Sprite::SetSrcY(int sourceY) { source.y = sourceY; };
+void clf::Utilities::Sprite::SetSrcW(int sourceW) { source.w = sourceW; };
+void clf::Utilities::Sprite::SetSrcH(int sourceH) { source.h = sourceH; };
 
 //Destination Member
-const SDL_FRect& clf::Sprite::GetDst() const { return destination; }
-float clf::Sprite::GetDstX() const { return destination.x; }
-float clf::Sprite::GetDstY() const { return destination.y; }
-float clf::Sprite::GetDstW() const { return destination.w; }
-float clf::Sprite::GetDstH() const { return destination.h; }
+const SDL_FRect& clf::Utilities::Sprite::GetDst() const { return destination; }
+float clf::Utilities::Sprite::GetDstX() const { return destination.x; }
+float clf::Utilities::Sprite::GetDstY() const { return destination.y; }
+float clf::Utilities::Sprite::GetDstW() const { return destination.w; }
+float clf::Utilities::Sprite::GetDstH() const { return destination.h; }
 
-void clf::Sprite::SetDst(float destinationX, float destinationY, float destinationW, float destinationH) {
+void clf::Utilities::Sprite::SetDst(float destinationX, float destinationY, float destinationW, float destinationH) {
 	destination.x = destinationX;
 	destination.y = destinationY;
 	destination.w = destinationW;
 	destination.h = destinationH;
 }
 
-void clf::Sprite::SetDstX(float destinationX) { destination.x = destinationX; }
-void clf::Sprite::SetDstY(float destinationY) { destination.y = destinationY; }
-void clf::Sprite::SetDstW(float destinationW) { destination.w = destinationW; }
-void clf::Sprite::SetDstH(float destinationH) { destination.h = destinationH; }
+void clf::Utilities::Sprite::SetDstX(float destinationX) { destination.x = destinationX; }
+void clf::Utilities::Sprite::SetDstY(float destinationY) { destination.y = destinationY; }
+void clf::Utilities::Sprite::SetDstW(float destinationW) { destination.w = destinationW; }
+void clf::Utilities::Sprite::SetDstH(float destinationH) { destination.h = destinationH; }
 
 //Texture Member
 //Be Careful with THIS!!
-SDL_Texture* clf::Sprite::GetTexture() const { return texture; }
+SDL_Texture* clf::Utilities::Sprite::GetTexture() const { return texture; }
 
-void clf::Sprite::SetTexture(SDL_Texture* texture) { 
+void clf::Utilities::Sprite::SetTexture(SDL_Texture* texture) { 
 	if (this->texture)
 		clf::Asset::FreeTexture(this->texture);
 
@@ -253,17 +253,17 @@ void clf::Sprite::SetTexture(SDL_Texture* texture) {
 }
 
 //Flip Member
-void clf::Sprite::SetFlip(const SDL_RendererFlip& flip) { this->flip = flip; }
+void clf::Utilities::Sprite::SetFlip(const SDL_RendererFlip& flip) { this->flip = flip; }
 
 //Angle Member
-double clf::Sprite::GetAngle() const { return angle; }
-void clf::Sprite::SetAngle(double angle) { this->angle = angle; }
+double clf::Utilities::Sprite::GetAngle() const { return angle; }
+void clf::Utilities::Sprite::SetAngle(double angle) { this->angle = angle; }
 
 // ----------------------------------------------------------------
-// - clf::Text Implementation                                     -
+// - clf::Utilities::Text Implementation                                     -
 // ----------------------------------------------------------------
 //Constructor
-clf::Text::Text() :
+clf::Utilities::Text::Text() :
 	texture{ nullptr },
 	text{ nullptr },
 	filepath{ nullptr },
@@ -274,7 +274,7 @@ clf::Text::Text() :
 }
 
 //Methods
-void clf::Text::OnStart(float x, float y, const char* filepath, const char* text, int size, const SDL_Color& color, int outline, int style) {
+void clf::Utilities::Text::OnStart(float x, float y, const char* filepath, const char* text, int size, const SDL_Color& color, int outline, int style) {
 	this->text = text;
 	this->size = size;
 	this->color = color;
@@ -282,18 +282,18 @@ void clf::Text::OnStart(float x, float y, const char* filepath, const char* text
 	this->style = style;
 	this->filepath = filepath;
 	texture = clf::Asset::LoadText(filepath, size, text, color, outline, style);
-	destination = { x, y, clf::Info::GetTextureWidthF(texture), clf::Info::GetTextureHeightF(texture) };
+	destination = { x, y, clf::Utilities::Info::GetTextureWidthF(texture), clf::Utilities::Info::GetTextureHeightF(texture) };
 }
 
-void clf::Text::Draw() {
+void clf::Utilities::Text::Draw() {
 	clf::Render::DrawTextCenterF(texture, destination);
 }
 
-void clf::Text::OnFinish() {
+void clf::Utilities::Text::OnFinish() {
 	clf::Asset::FreeTexture(texture);
 }
 
-void clf::Text::ReloadTexture() {
+void clf::Utilities::Text::ReloadTexture() {
 	if (this->texture)
 		clf::Asset::FreeTexture(texture);
 
@@ -303,8 +303,8 @@ void clf::Text::ReloadTexture() {
 //Getters and Setters
 //Texture Member
 //Be Careful with THIS!!
-SDL_Texture* clf::Text::GetTexture() const { return texture; }
-void clf::Text::SetTexture(SDL_Texture* texture) { 
+SDL_Texture* clf::Utilities::Text::GetTexture() const { return texture; }
+void clf::Utilities::Text::SetTexture(SDL_Texture* texture) { 
 	if (this->texture)
 		clf::Asset::FreeTexture(texture);
 
@@ -312,22 +312,22 @@ void clf::Text::SetTexture(SDL_Texture* texture) {
 }
 
 //Text Member
-const char* clf::Text::GetText() const { return text; }
+const char* clf::Utilities::Text::GetText() const { return text; }
 
-void clf::Text::SetText(const char* text) { 
+void clf::Utilities::Text::SetText(const char* text) { 
 	if (this->texture)
 		clf::Asset::FreeTexture(this->texture);
 
 	this->text = text;
 	ReloadTexture();
-	destination.w = clf::Info::GetTextureWidthF(texture);
-	destination.h = clf::Info::GetTextureHeightF(texture);
+	destination.w = clf::Utilities::Info::GetTextureWidthF(texture);
+	destination.h = clf::Utilities::Info::GetTextureHeightF(texture);
 }
 
 //Filepath Member
-const char* clf::Text::GetFilepath() const { return filepath; }
+const char* clf::Utilities::Text::GetFilepath() const { return filepath; }
 
-void clf::Text::SetFilepath(const char* filepath) { 
+void clf::Utilities::Text::SetFilepath(const char* filepath) { 
 	if (strcmp(this->filepath, filepath) == 0)
 		return;
 
@@ -337,28 +337,28 @@ void clf::Text::SetFilepath(const char* filepath) {
 }
 
 //Destination Member
-const SDL_FRect& clf::Text::GetDst() const { return destination; }
-float clf::Text::GetDstX() const { return destination.x; }
-float clf::Text::GetDstY() const { return destination.y; }
-float clf::Text::GetDstW() const { return destination.w; }
-float clf::Text::GetDstH() const { return destination.h; }
+const SDL_FRect& clf::Utilities::Text::GetDst() const { return destination; }
+float clf::Utilities::Text::GetDstX() const { return destination.x; }
+float clf::Utilities::Text::GetDstY() const { return destination.y; }
+float clf::Utilities::Text::GetDstW() const { return destination.w; }
+float clf::Utilities::Text::GetDstH() const { return destination.h; }
 
-void clf::Text::SetDst(float destinationX, float destinationY, float destinationW, float destinationH) {
+void clf::Utilities::Text::SetDst(float destinationX, float destinationY, float destinationW, float destinationH) {
 	destination.x = destinationX;
 	destination.y = destinationY;
 	destination.w = destinationW;
 	destination.h = destinationH;
 }
 
-void clf::Text::SetDstX(float destinationX) { destination.x = destinationX; }
-void clf::Text::SetDstY(float destinationY) { destination.y = destinationY; }
-void clf::Text::SetDstW(float destinationW) { destination.w = destinationW; }
-void clf::Text::SetDstH(float destinationH) { destination.h = destinationH; }
+void clf::Utilities::Text::SetDstX(float destinationX) { destination.x = destinationX; }
+void clf::Utilities::Text::SetDstY(float destinationY) { destination.y = destinationY; }
+void clf::Utilities::Text::SetDstW(float destinationW) { destination.w = destinationW; }
+void clf::Utilities::Text::SetDstH(float destinationH) { destination.h = destinationH; }
 
 //Color Member
-const SDL_Color& clf::Text::GetColor() const { return color; }
+const SDL_Color& clf::Utilities::Text::GetColor() const { return color; }
 
-void clf::Text::SetColor(const SDL_Color& color) {
+void clf::Utilities::Text::SetColor(const SDL_Color& color) {
 	if (this->color.r == color.r && this->color.g == color.g && this->color.b == color.b && this->color.a == color.a)
 		return;
 
@@ -367,22 +367,22 @@ void clf::Text::SetColor(const SDL_Color& color) {
 }
 
 //Font Style Members
-int clf::Text::GetSize() const { return size; }
+int clf::Utilities::Text::GetSize() const { return size; }
 
-void clf::Text::SetSize(int size) {
+void clf::Utilities::Text::SetSize(int size) {
 	if (this->size == size)
 		return;
 
 	this->size = size;
 
 	ReloadTexture();
-	destination.w = clf::Info::GetTextureWidthF(texture);
-	destination.h = clf::Info::GetTextureHeightF(texture);
+	destination.w = clf::Utilities::Info::GetTextureWidthF(texture);
+	destination.h = clf::Utilities::Info::GetTextureHeightF(texture);
 }
 
-int clf::Text::GetOutline() const { return outline; }
+int clf::Utilities::Text::GetOutline() const { return outline; }
 
-void clf::Text::SetOutline(int outline) {
+void clf::Utilities::Text::SetOutline(int outline) {
 	if (this->outline == outline)
 		return;
 
@@ -390,23 +390,23 @@ void clf::Text::SetOutline(int outline) {
 	ReloadTexture();
 }
 
-int clf::Text::GetStyle() const { return style; }
+int clf::Utilities::Text::GetStyle() const { return style; }
 
-void clf::Text::SetStyle(int style) {
+void clf::Utilities::Text::SetStyle(int style) {
 	if (this->style == style)
 		return;
 
 	this->style = style;
 	ReloadTexture();
-	destination.w = clf::Info::GetTextureWidthF(texture);
-	destination.h = clf::Info::GetTextureHeightF(texture);
+	destination.w = clf::Utilities::Info::GetTextureWidthF(texture);
+	destination.h = clf::Utilities::Info::GetTextureHeightF(texture);
 }
 
 // ----------------------------------------------------------------
 // - Sfx Implementation                                           - 
 // ----------------------------------------------------------------
 //Constructor
-clf::Sfx::Sfx() :
+clf::Utilities::Sfx::Sfx() :
 	sound{ nullptr },
 	filepath{ nullptr },
 	channel{ -1 },
@@ -415,7 +415,7 @@ clf::Sfx::Sfx() :
 }
 
 //Methods
-void clf::Sfx::OnStart(const char* filepath, int channel, size_t volume) {
+void clf::Utilities::Sfx::OnStart(const char* filepath, int channel, size_t volume) {
 	this->filepath = filepath;
 	this->channel = channel;
 	this->volume = volume;
@@ -423,14 +423,14 @@ void clf::Sfx::OnStart(const char* filepath, int channel, size_t volume) {
 	sound = clf::Asset::LoadSound(filepath);
 }
 
-void clf::Sfx::OnFinish() {
+void clf::Utilities::Sfx::OnFinish() {
 	clf::Asset::FreeSound(sound);
 }
 
 //Getters and Setters
-Mix_Chunk* clf::Sfx::GetSound() const { return sound; }
+Mix_Chunk* clf::Utilities::Sfx::GetSound() const { return sound; }
 
-void clf::Sfx::SetSound(Mix_Chunk* sound) { 
+void clf::Utilities::Sfx::SetSound(Mix_Chunk* sound) { 
 	if (sound)
 		clf::Asset::FreeSound(sound);
 
@@ -438,9 +438,9 @@ void clf::Sfx::SetSound(Mix_Chunk* sound) {
 }
 
 //Filepath Member
-const char* clf::Sfx::GetFilepath() const { return filepath; }
+const char* clf::Utilities::Sfx::GetFilepath() const { return filepath; }
 
-void clf::Sfx::SetFilepath(const char* filepath) {
+void clf::Utilities::Sfx::SetFilepath(const char* filepath) {
 	if (strcmp(this->filepath, filepath) == 0)
 		return;
 
@@ -453,36 +453,36 @@ void clf::Sfx::SetFilepath(const char* filepath) {
 }
 
 //Channel Member
-int clf::Sfx::GetChannel() const { return channel; }
-void clf::Sfx::SetChannel(int channel) { this->channel = channel; }
+int clf::Utilities::Sfx::GetChannel() const { return channel; }
+void clf::Utilities::Sfx::SetChannel(int channel) { this->channel = channel; }
 
 //Volume Member
-size_t clf::Sfx::GetVolume() const { return volume; }
-void clf::Sfx::SetVolume(size_t volume) { this->volume = volume; }
+size_t clf::Utilities::Sfx::GetVolume() const { return volume; }
+void clf::Utilities::Sfx::SetVolume(size_t volume) { this->volume = volume; }
 
 // ----------------------------------------------------------------
 // - Music Implementation                                         - 
 // ----------------------------------------------------------------
-clf::Music::Music() :
+clf::Utilities::Music::Music() :
 	music{ nullptr },
 	filepath{ nullptr } {
 
 }
 
 //Methods
-void clf::Music::OnStart(const char* filepath) {
+void clf::Utilities::Music::OnStart(const char* filepath) {
 	this->filepath = filepath;
 	music = clf::Asset::LoadMusic(filepath);
 }
 
-void clf::Music::OnFinish() {
+void clf::Utilities::Music::OnFinish() {
 	clf::Asset::FreeMusic(music);
 }
 
 //Getters and Setters
 //Music Member
-Mix_Music* clf::Music::GetMusic() const { return music; }
-void clf::Music::SetMusic(Mix_Music* music) {
+Mix_Music* clf::Utilities::Music::GetMusic() const { return music; }
+void clf::Utilities::Music::SetMusic(Mix_Music* music) {
 	if (this->music)
 		clf::Asset::FreeMusic(this->music);
 
@@ -490,9 +490,9 @@ void clf::Music::SetMusic(Mix_Music* music) {
 }
 
 //Filepath Member
-const char* clf::Music::GetFilepath() const { return filepath; }
+const char* clf::Utilities::Music::GetFilepath() const { return filepath; }
 
-void clf::Music::SetFilepath(const char* filepath) {
+void clf::Utilities::Music::SetFilepath(const char* filepath) {
 	if (strcmp(this->filepath, filepath) == 0)
 		return;
 
@@ -599,11 +599,11 @@ void clf::Render::DrawFillRectF(const SDL_FRect& topLeft, const SDL_Color& color
 }
 
 void clf::Render::DrawFillRectCenter(const SDL_Rect& center, const SDL_Color& color) {
-	DrawFillRect(clf::Info::GetRectTopLeft(center), color);
+	DrawFillRect(clf::Utilities::Info::GetRectTopLeft(center), color);
 }
 
 void clf::Render::DrawFillRectCenterF(const SDL_FRect& center, const SDL_Color& color) {
-	DrawFillRectF(clf::Info::GetRectTopLeftF(center), color);
+	DrawFillRectF(clf::Utilities::Info::GetRectTopLeftF(center), color);
 }
 
 void clf::Render::DrawRect(const SDL_Rect& topLeft, const SDL_Color& color) {
@@ -617,19 +617,19 @@ void clf::Render::DrawRectF(const SDL_FRect& topLeft, const SDL_Color& color) {
 }
 
 void clf::Render::DrawRectCenter(const SDL_Rect& center, const SDL_Color& color) {
-	DrawRect(clf::Info::GetRectTopLeft(center), color);
+	DrawRect(clf::Utilities::Info::GetRectTopLeft(center), color);
 }
 
 void clf::Render::DrawRectCenterF(const SDL_FRect& center, const SDL_Color& color) {
-	DrawRectF(clf::Info::GetRectTopLeftF(center), color);
+	DrawRectF(clf::Utilities::Info::GetRectTopLeftF(center), color);
 }
 
 void clf::Render::DrawCircle(const SDL_Point& topLeft, int radius, const SDL_Color& color) {
-	DrawCircleCenter(clf::Info::GetPointCenter(topLeft, radius * 2), radius, color);
+	DrawCircleCenter(clf::Utilities::Info::GetPointCenter(topLeft, radius * 2), radius, color);
 }
 
 void clf::Render::DrawCircleF(const SDL_FPoint& topLeft, float radius, const SDL_Color& color) {
-	DrawCircleCenterF(clf::Info::GetPointCenterF(topLeft, radius * 2.0f), radius, color);
+	DrawCircleCenterF(clf::Utilities::Info::GetPointCenterF(topLeft, radius * 2.0f), radius, color);
 }
 
 void clf::Render::DrawCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color) {
@@ -672,11 +672,11 @@ void clf::Render::DrawFillCircleF(const SDL_FPoint& topLeft, float radius, const
 }
 
 void clf::Render::DrawFillCircleCenter(const SDL_Point& center, int radius, const SDL_Color& color) {
-	DrawFillCircle(clf::Info::GetPointTopLeft(center, radius * 2), radius, color);
+	DrawFillCircle(clf::Utilities::Info::GetPointTopLeft(center, radius * 2), radius, color);
 }
 
 void clf::Render::DrawFillCircleCenterF(const SDL_FPoint& center, float radius, const SDL_Color& color) {
-	DrawFillCircleF(clf::Info::GetPointTopLeftF(center, radius * 2.0f), radius, color);
+	DrawFillCircleF(clf::Utilities::Info::GetPointTopLeftF(center, radius * 2.0f), radius, color);
 }
 
 void clf::Render::DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color) {
@@ -718,11 +718,11 @@ void clf::Render::DrawSpriteF(SDL_Texture* texture, const SDL_Rect& source, cons
 }
 
 void clf::Render::DrawSpriteCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center) {
-	DrawSprite(texture, source, clf::Info::GetRectTopLeft(center));
+	DrawSprite(texture, source, clf::Utilities::Info::GetRectTopLeft(center));
 }
 
 void clf::Render::DrawSpriteCenterF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& center) {
-	DrawSpriteF(texture, source, clf::Info::GetRectTopLeftF(center));
+	DrawSpriteF(texture, source, clf::Utilities::Info::GetRectTopLeftF(center));
 }
 
 void clf::Render::DrawSpriteRot(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip) {
@@ -734,11 +734,11 @@ void clf::Render::DrawSpriteRotF(SDL_Texture* texture, const SDL_Rect& source, c
 }
 
 void clf::Render::DrawSpriteRotCenter(SDL_Texture* texture, const SDL_Rect& source, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip) {
-	DrawSpriteRot(texture, source, clf::Info::GetRectTopLeft(center), angle, flip);
+	DrawSpriteRot(texture, source, clf::Utilities::Info::GetRectTopLeft(center), angle, flip);
 }
 
 void clf::Render::DrawSpriteRotCenterF(SDL_Texture* texture, const SDL_Rect& source, const SDL_FRect& center, const double angle, const SDL_RendererFlip& flip) {
-	DrawSpriteRotF(texture, source, clf::Info::GetRectTopLeftF(center), angle, flip);
+	DrawSpriteRotF(texture, source, clf::Utilities::Info::GetRectTopLeftF(center), angle, flip);
 }
 
 void clf::Render::DrawText(SDL_Texture* texture, const SDL_Rect& topLeft) {
@@ -750,11 +750,11 @@ void clf::Render::DrawTextF(SDL_Texture* texture, const SDL_FRect& topLeft) {
 }
 
 void clf::Render::DrawTextCenter(SDL_Texture* texture, const SDL_Rect& center) {
-	DrawText(texture, clf::Info::GetRectTopLeft(center));
+	DrawText(texture, clf::Utilities::Info::GetRectTopLeft(center));
 }
 
 void clf::Render::DrawTextCenterF(SDL_Texture* texture, const SDL_FRect& center) {
-	DrawTextF(texture, clf::Info::GetRectTopLeftF(center));
+	DrawTextF(texture, clf::Utilities::Info::GetRectTopLeftF(center));
 }
 
 void clf::Render::DrawTextRot(SDL_Texture* texture, const SDL_Rect& topLeft, const double angle, const SDL_RendererFlip& flip) {
@@ -766,11 +766,11 @@ void clf::Render::DrawTextRotF(SDL_Texture* texture, const SDL_FRect& topLeft, c
 }
 
 void clf::Render::DrawTextRotCenter(SDL_Texture* texture, const SDL_Rect& center, const double angle, const SDL_RendererFlip& flip) {
-	DrawTextRot(texture, clf::Info::GetRectTopLeft(center), angle, flip);
+	DrawTextRot(texture, clf::Utilities::Info::GetRectTopLeft(center), angle, flip);
 }
 
 void clf::Render::DrawTextRotCenterF(SDL_Texture* texture, const SDL_FRect& center, const double angle, const SDL_RendererFlip& flip) {
-	DrawTextRotF(texture, clf::Info::GetRectTopLeftF(center), angle, flip);
+	DrawTextRotF(texture, clf::Utilities::Info::GetRectTopLeftF(center), angle, flip);
 }
 
 // ----------------------------------------------------------------

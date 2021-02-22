@@ -47,209 +47,213 @@ namespace clf {
 		SDL_Event event;
 	};
 
-	// ----------------------------------------------------------------
-	// - Info Specification                                           -
-	// ----------------------------------------------------------------
-	//Useful info about SDL classes
-	class Info {
-	private:
-		Info() = default;
-		~Info() = default;
-	public:
-		static int GetTextureWidth(SDL_Texture* texture);
-		static float GetTextureWidthF(SDL_Texture* texture);
-		static int GetTextureHeight(SDL_Texture* texture);
-		static float GetTextureHeightF(SDL_Texture* texture);
-		static SDL_Rect GetRectCenter(const SDL_Rect& topLeft);
-		static SDL_FRect GetRectCenterF(const SDL_FRect& topLeft);
-		static SDL_Rect GetRectTopLeft(const SDL_Rect& center);
-		static SDL_FRect GetRectTopLeftF(const SDL_FRect& center);
-		static SDL_Point GetPointCenter(const SDL_Point& topLeft, int size);
-		static SDL_FPoint GetPointCenterF(const SDL_FPoint& topLeft, float size);
-		static SDL_Point GetPointTopLeft(const SDL_Point& center, int size);
-		static SDL_FPoint GetPointTopLeftF(const SDL_FPoint& center, float size);
-	};
+	//Utilities work from center origin
+	namespace Utilities { 
+		// ----------------------------------------------------------------
+		// - Info Specification                                           -
+		// ----------------------------------------------------------------
+		//Useful info about SDL classes
+		class Info {
+		private:
+			Info() = default;
+			~Info() = default;
+		public:
+			static int GetTextureWidth(SDL_Texture* texture);
+			static float GetTextureWidthF(SDL_Texture* texture);
+			static int GetTextureHeight(SDL_Texture* texture);
+			static float GetTextureHeightF(SDL_Texture* texture);
+			static SDL_Rect GetRectCenter(const SDL_Rect& topLeft);
+			static SDL_FRect GetRectCenterF(const SDL_FRect& topLeft);
+			static SDL_Rect GetRectTopLeft(const SDL_Rect& center);
+			static SDL_FRect GetRectTopLeftF(const SDL_FRect& center);
+			static SDL_Point GetPointCenter(const SDL_Point& topLeft, int size);
+			static SDL_FPoint GetPointCenterF(const SDL_FPoint& topLeft, float size);
+			static SDL_Point GetPointTopLeft(const SDL_Point& center, int size);
+			static SDL_FPoint GetPointTopLeftF(const SDL_FPoint& center, float size);
+		};
 
-	// ----------------------------------------------------------------
-	// - Sprite Specification                                         -
-	// ----------------------------------------------------------------
-	class Sprite {
-	public:
-		Sprite();
-		~Sprite() = default;
-	public:
-		void OnStart(
-			int srcX, int srcY, int srcW, int srcH,
-			float dstX, float dstY, float dstW, float dstH,
-			const char* filepath, const SDL_RendererFlip& flip, double angle);
-		void Draw();
-		void OnFinish();
-	public:
-		//Getters and Setters
-		//Source Member
-		const SDL_Rect& GetSrc() const;
-		int GetSrcX() const;
-		int GetSrcY() const;
-		int GetSrcW() const;
-		int GetSrcH() const;
-		void SetSrc(int sourceX, int sourceY, int sourceW, int sourceH);
-		void SetSrcX(int sourceX);
-		void SetSrcY(int sourceY);
-		void SetSrcW(int sourceW);
-		void SetSrcH(int sourceH);
-		//Destination Member
-		const SDL_FRect& GetDst() const;
-		float GetDstX() const;
-		float GetDstY() const;
-		float GetDstW() const;
-		float GetDstH() const;
-		void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
-		void SetDstX(float destinationX);
-		void SetDstY(float destinationY);
-		void SetDstW(float destinationW);
-		void SetDstH(float destinationH);
-		//Texture Member
-		//Be Careful with THIS!!
-		SDL_Texture* GetTexture() const;
-		void SetTexture(SDL_Texture* texture);
-		//Flip Member
-		void SetFlip(const SDL_RendererFlip& flip);
-		//Angle Member
-		double GetAngle() const;
-		void SetAngle(double angle);
-	private:
-		SDL_Rect source;
-		SDL_FRect destination;
-		SDL_Texture* texture;
-		SDL_RendererFlip flip;
-		double angle;
-	};
+		// ----------------------------------------------------------------
+		// - Sprite Specification                                         -
+		// ----------------------------------------------------------------
+		class Sprite {
+		public:
+			Sprite();
+			~Sprite() = default;
+		public:
+			void OnStart(
+				int srcX, int srcY, int srcW, int srcH,
+				float dstX, float dstY, float dstW, float dstH,
+				const char* filepath, const SDL_RendererFlip& flip, double angle);
+			void Draw();
+			void OnFinish();
+		public:
+			//Getters and Setters
+			//Source Member
+			const SDL_Rect& GetSrc() const;
+			int GetSrcX() const;
+			int GetSrcY() const;
+			int GetSrcW() const;
+			int GetSrcH() const;
+			void SetSrc(int sourceX, int sourceY, int sourceW, int sourceH);
+			void SetSrcX(int sourceX);
+			void SetSrcY(int sourceY);
+			void SetSrcW(int sourceW);
+			void SetSrcH(int sourceH);
+			//Destination Member
+			const SDL_FRect& GetDst() const;
+			float GetDstX() const;
+			float GetDstY() const;
+			float GetDstW() const;
+			float GetDstH() const;
+			void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
+			void SetDstX(float destinationX);
+			void SetDstY(float destinationY);
+			void SetDstW(float destinationW);
+			void SetDstH(float destinationH);
+			//Texture Member
+			//Be Careful with THIS!!
+			SDL_Texture* GetTexture() const;
+			void SetTexture(SDL_Texture* texture);
+			//Flip Member
+			void SetFlip(const SDL_RendererFlip& flip);
+			//Angle Member
+			double GetAngle() const;
+			void SetAngle(double angle);
+		private:
+			SDL_Rect source;
+			SDL_FRect destination;
+			SDL_Texture* texture;
+			SDL_RendererFlip flip;
+			double angle;
+		};
 
-	// ----------------------------------------------------------------
-	// - Text Specification                                           -
-	// ----------------------------------------------------------------
-	class Text {
-	public:
-		Text();
-		~Text() = default;
-	public:
-		void OnStart(float x, float y, const char* filepath, const char* text, int size, const SDL_Color& color, int outline, int style);
-		void Draw();
-		void OnFinish();
-	public:
-		//Getters and Setters
-		//Texture Member
-		//Be Careful with THIS!!
-		SDL_Texture* GetTexture() const;
-		void SetTexture(SDL_Texture* texture);
-		//Text Member
-		const char* GetText() const;
-		void SetText(const char* text);
-		//Filepath Member
-		const char* GetFilepath() const;
-		void SetFilepath(const char* filepath);
-		//Destination Member
-		const SDL_FRect& GetDst() const;
-		float GetDstX() const;
-		float GetDstY() const;
-		float GetDstW() const;
-		float GetDstH() const;
-		void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
-		void SetDstX(float destinationX);
-		void SetDstY(float destinationY);
-		void SetDstW(float destinationW);
-		void SetDstH(float destinationH);
-		//Color Member
-		const SDL_Color& GetColor() const;
-		void SetColor(const SDL_Color& color);
-		//Font Style Members
-		int GetSize() const;
-		void SetSize(int size);
-		int GetOutline() const;
-		void SetOutline(int outline);
-		int GetStyle() const;
-		void SetStyle(int style);
-	private:
-		void ReloadTexture();
-		SDL_Texture* texture;
-		const char* text;
-		const char* filepath;
-		SDL_FRect destination;
-		SDL_Color color;
-		int size, outline, style;
-	};
+		// ----------------------------------------------------------------
+		// - Text Specification                                           -
+		// ----------------------------------------------------------------
+		class Text {
+		public:
+			Text();
+			~Text() = default;
+		public:
+			void OnStart(float x, float y, const char* filepath, const char* text, int size, const SDL_Color& color, int outline, int style);
+			void Draw();
+			void OnFinish();
+		public:
+			//Getters and Setters
+			//Texture Member
+			//Be Careful with THIS!!
+			SDL_Texture* GetTexture() const;
+			void SetTexture(SDL_Texture* texture);
+			//Text Member
+			const char* GetText() const;
+			void SetText(const char* text);
+			//Filepath Member
+			const char* GetFilepath() const;
+			void SetFilepath(const char* filepath);
+			//Destination Member
+			const SDL_FRect& GetDst() const;
+			float GetDstX() const;
+			float GetDstY() const;
+			float GetDstW() const;
+			float GetDstH() const;
+			void SetDst(float destinationX, float destinationY, float destinationW, float destinationH);
+			void SetDstX(float destinationX);
+			void SetDstY(float destinationY);
+			void SetDstW(float destinationW);
+			void SetDstH(float destinationH);
+			//Color Member
+			const SDL_Color& GetColor() const;
+			void SetColor(const SDL_Color& color);
+			//Font Style Members
+			int GetSize() const;
+			void SetSize(int size);
+			int GetOutline() const;
+			void SetOutline(int outline);
+			int GetStyle() const;
+			void SetStyle(int style);
+		private:
+			void ReloadTexture();
+			SDL_Texture* texture;
+			const char* text;
+			const char* filepath;
+			SDL_FRect destination;
+			SDL_Color color;
+			int size, outline, style;
+		};
 
-	// ----------------------------------------------------------------
-	// - Sfx Specification                                            - 
-	// ----------------------------------------------------------------
-	class Sfx {
-	public:
-		Sfx();
-		~Sfx() = default;
-	public:
-		void OnStart(const char* filepath, int channel, size_t volume);
-		void OnFinish();
-	public:
-		//Getters and Setters
-		//Sound Member
-		Mix_Chunk* GetSound() const;
-		void SetSound(Mix_Chunk* sound);
-		//Filepath Member
-		const char* GetFilepath() const;
-		void SetFilepath(const char* filepath);
-		//Channel Member
-		int GetChannel() const;
-		void SetChannel(int channel);
-		//Volume Member
-		size_t GetVolume() const;
-		void SetVolume(size_t volume);
-	private:
-		Mix_Chunk* sound;
-		const char* filepath;
-		int channel;
-		size_t volume;
-	};
+		// ----------------------------------------------------------------
+		// - Sfx Specification                                            - 
+		// ----------------------------------------------------------------
+		class Sfx {
+		public:
+			Sfx();
+			~Sfx() = default;
+		public:
+			void OnStart(const char* filepath, int channel, size_t volume);
+			void OnFinish();
+		public:
+			//Getters and Setters
+			//Sound Member
+			Mix_Chunk* GetSound() const;
+			void SetSound(Mix_Chunk* sound);
+			//Filepath Member
+			const char* GetFilepath() const;
+			void SetFilepath(const char* filepath);
+			//Channel Member
+			int GetChannel() const;
+			void SetChannel(int channel);
+			//Volume Member
+			size_t GetVolume() const;
+			void SetVolume(size_t volume);
+		private:
+			Mix_Chunk* sound;
+			const char* filepath;
+			int channel;
+			size_t volume;
+		};
 
-	// ----------------------------------------------------------------
-	// - Music Specification                                          - 
-	// ----------------------------------------------------------------
-	class Music {
-	public:
-		Music();
-		~Music() = default;
-	public:
-		void OnStart(const char* filepath);
-		void OnFinish();
-	public:
-		//Getters and Setters
-		//Music Member
-		Mix_Music* GetMusic() const;
-		void SetMusic(Mix_Music* music);
-		//Filepath Member
-		const char* GetFilepath() const;
-		void SetFilepath(const char* filepath);
-	private:
-		Mix_Music* music;
-		const char* filepath;
-	};
+		// ----------------------------------------------------------------
+		// - Music Specification                                          - 
+		// ----------------------------------------------------------------
+		class Music {
+		public:
+			Music();
+			~Music() = default;
+		public:
+			void OnStart(const char* filepath);
+			void OnFinish();
+		public:
+			//Getters and Setters
+			//Music Member
+			Mix_Music* GetMusic() const;
+			void SetMusic(Mix_Music* music);
+			//Filepath Member
+			const char* GetFilepath() const;
+			void SetFilepath(const char* filepath);
+		private:
+			Mix_Music* music;
+			const char* filepath;
+		};
 
-	// ----------------------------------------------------------------
-	// - Color Constants		                                      -
-	// ----------------------------------------------------------------
-	class Color {
-	private:
-		Color() = default;
-		~Color() = default;
-	public:
-		static constexpr SDL_Color METALLIC_BRONZE{ 76, 57, 26, 255 };
-		static constexpr SDL_Color HOT_PINK{ 255, 102, 209, 255 };
-		static constexpr SDL_Color POMEGRANATE{ 239, 52, 52, 255 };
-		static constexpr SDL_Color MALIBU{ 94, 150, 255, 255 };
-		static constexpr SDL_Color PORTAFINO{ 255, 249, 186, 255 };
-		static constexpr SDL_Color SCREAMIN_GREEN{ 87, 249, 84, 255 };
-		static constexpr SDL_Color TURQUOISE{ 68, 229, 162, 255 };
-		static constexpr SDL_Color ROYAL_BLUE{ 114, 66, 237, 255 };
-	};
+		// ----------------------------------------------------------------
+		// - Color Constants		                                      -
+		// ----------------------------------------------------------------
+		class Color {
+		private:
+			Color() = default;
+			~Color() = default;
+		public:
+			static constexpr SDL_Color METALLIC_BRONZE{ 76, 57, 26, 255 };
+			static constexpr SDL_Color HOT_PINK{ 255, 102, 209, 255 };
+			static constexpr SDL_Color POMEGRANATE{ 239, 52, 52, 255 };
+			static constexpr SDL_Color MALIBU{ 94, 150, 255, 255 };
+			static constexpr SDL_Color PORTAFINO{ 255, 249, 186, 255 };
+			static constexpr SDL_Color SCREAMIN_GREEN{ 87, 249, 84, 255 };
+			static constexpr SDL_Color TURQUOISE{ 68, 229, 162, 255 };
+			static constexpr SDL_Color ROYAL_BLUE{ 114, 66, 237, 255 };
+		};
+
+	}
 
 	// ----------------------------------------------------------------
 	// - Asset Specification                                          -
