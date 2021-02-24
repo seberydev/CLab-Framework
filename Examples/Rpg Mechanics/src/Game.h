@@ -2,6 +2,7 @@
 
 #include "clf.h"
 #include "Skeleton.h"
+#include "Spawner.h"
 
 class Game : public clf::Engine {
 protected:
@@ -14,4 +15,9 @@ private:
 	clf::Utilities::Sprite bg;
 	Skeleton skeleton;
 	float bottomSize = 50.0f;
+	clf::Utilities::Text message;
+	SDL_Color black{ 0, 0, 0, 255 };
+	clf::Utilities::Text scoreText;
+	int score = 0;
+	Spawner spawner;
 };

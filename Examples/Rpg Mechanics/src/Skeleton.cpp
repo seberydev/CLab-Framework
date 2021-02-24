@@ -2,12 +2,16 @@
 
 void Skeleton::OnStart(float x, float y) {
 	skeleton.OnStart(
-		16, 0, 16, 16,
+		0, 0, 16, 16,
 		x, y, 64.0f, 64.0f,
 		"assets/skeleton.png",
 		SDL_FLIP_NONE, 0.0);
 
 	ChangeAnimID();
+	maxX = clf::Engine::ScreenWidthF() - skeleton.GetDstW() / 2.0f;
+	minX = skeleton.GetDstW() / 2.0f;
+	maxY = clf::Engine::ScreenHeightF() - 50.0f - skeleton.GetDstH();
+	minY = skeleton.GetDstH() / 2.0f;
 }
 
 void Skeleton::OnInput(const Uint8* keystates) {
@@ -38,6 +42,8 @@ void Skeleton::OnInput(const Uint8* keystates) {
 }
 
 void Skeleton::OnUpdate(float deltaTime) {
+
+
 	//Normalize Direction
 	float magnitude = sqrtf(direction.x * direction.x + direction.y * direction.y);
 	if (magnitude > 1.0f) {
@@ -49,7 +55,22 @@ void Skeleton::OnUpdate(float deltaTime) {
 	skeleton.SetDstX(skeleton.GetDstX() + direction.x * speed * deltaTime);
 	skeleton.SetDstY(skeleton.GetDstY() + direction.y * speed * deltaTime);
 
+	SetOnBound();
+
 	//Change Animation
+	if (direction.x != 0.0f || direction.y != 0.0f) {
+		currentTime += deltaTime;
+
+		if (currentTime >= animDelay) {
+			currentTime = 0.0f;
+			MoveAnim(deltaTime);
+		}
+	} else {
+		currentTime = 0.0f;
+		skeleton.SetSrcX(16);
+	}
+
+
 	ChangeAnimID();
 }
 
@@ -62,22 +83,53 @@ void Skeleton::OnFinish() {
 }
 
 void Skeleton::ChangeAnimID() {
-	int n = 0;
+	int y = 0;
+	int x = 1;
 
 	switch (animID) {
 	case AnimationID::IDLE_DOWN:
-		n = 0;
+		y = 0;
 		break;
 	case AnimationID::IDLE_UP:
-		n = 3;
+		y = 3;
 		break;
 	case AnimationID::IDLE_RIGHT:
-		n = 2;
+		y = 2;
 		break;
 	case AnimationID::IDLE_LEFT:
-		n = 1;
+		y = 1;
 		break;
 	}
 
-	skeleton.SetSrcY(skeleton.GetSrcH() * n);
+	skeleton.SetSrcY(skeleton.GetSrcH() * y);
+}
+
+void Skeleton::MoveAnim(float deltaTime) {
+	int nextX = animIndex * skeleton.GetSrcW();
+	
+	if (nextX > skeleton.GetSrcW() * (animTotalFrames - 1)) {
+		nextX = 0;
+		animIndex = 1;
+	} else {
+		++animIndex;
+	}
+
+	skeleton.SetSrcX(nextX);
+}
+
+void Skeleton::SetOnBound() {
+	float x = skeleton.GetDstX();
+	float y = skeleton.GetDstY();
+
+	if (x >= maxX)
+		skeleton.SetDstX(maxX);
+
+	if (x <= minX)
+		skeleton.SetDstX(minX);
+
+	if (y >= maxY)
+		skeleton.SetDstY(maxY);
+
+	if (y <= minY)
+		skeleton.SetDstY(minY);
 }
