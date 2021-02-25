@@ -5,6 +5,8 @@
 #include "Spawner.h"
 
 class Game : public clf::Engine {
+public:
+	static int score;
 protected:
 	void OnStart() override;
 	void OnInput(const Uint8* keystates) override;
@@ -18,6 +20,7 @@ private:
 	clf::Utilities::Text message;
 	SDL_Color black{ 0, 0, 0, 255 };
 	clf::Utilities::Text scoreText;
-	int score = 0;
+	clf::Utilities::Text scoreNumberText;
 	Spawner spawner;
+	int oldScore = 0;
 };

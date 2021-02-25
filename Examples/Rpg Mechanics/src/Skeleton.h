@@ -9,6 +9,7 @@ public:
 	void OnUpdate(float deltaTime);
 	void Draw();
 	void OnFinish();
+	const SDL_FRect& GetPos() const;
 private:
 	enum class AnimationID {
 		IDLE_DOWN = 0,

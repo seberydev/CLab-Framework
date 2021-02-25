@@ -1,5 +1,6 @@
 #include "Game.h"
-#include <iostream>
+
+int Game::score = 0;
 
 void Game::OnStart() {
 	bg.OnStart(
@@ -13,7 +14,11 @@ void Game::OnStart() {
 
 	scoreText.OnStart(
 		80, 25,
-		"assets/Oleaguid.ttf", "Score 0", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
+		"assets/Oleaguid.ttf", "Score ", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
+
+	scoreNumberText.OnStart(
+		135, 25,
+		"assets/Oleaguid.ttf", "0", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
 
 	skeleton.OnStart(bg.GetDstW() / 2.0f, bg.GetDstH() / 2.0f);
 
@@ -27,15 +32,22 @@ void Game::OnInput(const Uint8* keystates) {
 void Game::OnUpdate(float deltaTime) {
 	skeleton.OnUpdate(deltaTime);
 	spawner.OnUpdate(deltaTime);
+	spawner.CheckCollision(clf::Utilities::Info::GetRectTopLeftF(skeleton.GetPos()));
+
+	if (oldScore != score) {
+		oldScore = score;
+		scoreNumberText.SetText(std::to_string(oldScore).c_str());
+	}
 }
 
 void Game::OnRender() {
 	clf::Render::Clear(black);
 	bg.Draw();
+	spawner.Draw();
 	skeleton.Draw();
 	message.Draw();
 	scoreText.Draw();
-	spawner.Draw();
+	scoreNumberText.Draw();
 }
 
 void Game::OnFinish() {
@@ -44,4 +56,5 @@ void Game::OnFinish() {
 	message.OnFinish();
 	scoreText.OnFinish();
 	spawner.OnFinish();
+	scoreNumberText.OnFinish();
 }

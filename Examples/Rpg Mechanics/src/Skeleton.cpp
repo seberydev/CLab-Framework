@@ -14,6 +14,8 @@ void Skeleton::OnStart(float x, float y) {
 	minY = skeleton.GetDstH() / 2.0f;
 }
 
+const SDL_FRect& Skeleton::GetPos() const { return skeleton.GetDst(); }
+
 void Skeleton::OnInput(const Uint8* keystates) {
 	//Input to Move Skeleton Up-Down
 	if (keystates[SDL_SCANCODE_W]) {
