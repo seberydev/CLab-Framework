@@ -247,6 +247,8 @@ namespace clf {
 			Color() = default;
 			~Color() = default;
 		public:
+			static constexpr SDL_Color WHITE{ 255, 255, 255, 255 };
+			static constexpr SDL_Color BLACK{ 0, 0, 0, 255 };
 			static constexpr SDL_Color METALLIC_BRONZE{ 76, 57, 26, 255 };
 			static constexpr SDL_Color HOT_PINK{ 255, 102, 209, 255 };
 			static constexpr SDL_Color POMEGRANATE{ 239, 52, 52, 255 };
@@ -287,6 +289,10 @@ namespace clf {
 		~Render() = default;
 	public:
 		static void Clear(const SDL_Color& color);
+		static void DrawPixel(int topLeftX, int topLeftY, const SDL_Color& color);
+		static void DrawPixelF(float topLeftX, float topLeftY, const SDL_Color& color);
+		static void DrawPixelCenter(int centerX, int centerY, const SDL_Color& color);
+		static void DrawPixelCenterF(float centerX, float centerY, const SDL_Color& color);
 		static void DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color);
 		static void DrawLineF(const SDL_FPoint& start, const SDL_FPoint& end, const SDL_Color& color);
 		static void DrawTriangle(const SDL_Point& v1, const SDL_Point& v2, const SDL_Point& v3, const SDL_Color& color);

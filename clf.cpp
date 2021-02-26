@@ -584,6 +584,26 @@ void clf::Render::Clear(const SDL_Color& color) {
 	SDL_RenderClear(clf::Engine::GetRenderer());
 }
 
+void clf::Render::DrawPixel(int topLeftX, int topLeftY, const SDL_Color& color) {
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawPoint(clf::Engine::GetRenderer(), topLeftX, topLeftY);
+}
+
+void clf::Render::DrawPixelF(float topLeftX, float topLeftY, const SDL_Color& color) {
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawPointF(clf::Engine::GetRenderer(), topLeftX, topLeftY);
+}
+
+void clf::Render::DrawPixelCenter(int centerX, int centerY, const SDL_Color& color) {
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawPoint(clf::Engine::GetRenderer(), (clf::Engine::ScreenWidth() / 2) + centerX, (clf::Engine::ScreenHeight() / 2) - centerY);
+}
+
+void clf::Render::DrawPixelCenterF(float centerX, float centerY, const SDL_Color& color) {
+	SDL_SetRenderDrawColor(clf::Engine::GetRenderer(), color.r, color.g, color.b, color.a);
+	SDL_RenderDrawPointF(clf::Engine::GetRenderer(), (clf::Engine::ScreenWidthF() / 2.0f) + centerX, (clf::Engine::ScreenHeightF() / 2.0f) - centerY);
+}
+
 void clf::Render::DrawLine(const SDL_Point& start, const SDL_Point& end, const SDL_Color& color) {
 	SDL_RenderDrawLine(clf::Engine::GetRenderer(), start.x, start.y, end.x, end.y);
 }
