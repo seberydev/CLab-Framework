@@ -18,9 +18,15 @@ private:
 	Skeleton skeleton;
 	float bottomSize = 50.0f;
 	clf::Utilities::Text message;
-	SDL_Color black{ 0, 0, 0, 255 };
 	clf::Utilities::Text scoreText;
 	clf::Utilities::Text scoreNumberText;
+	clf::Utilities::Text timeText;
+	clf::Utilities::Text maxScoreText;
+	clf::Utilities::Text maxScoreNumberText;
+	SDL_Color black{ 0, 0, 0, 255 };
 	Spawner spawner;
 	int oldScore = 0;
+	int seconds = 60;
+	float currentTime = 0.0f;
+	int maxScore = 0;
 };

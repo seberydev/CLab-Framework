@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 int Game::score = 0;
 
@@ -20,6 +21,18 @@ void Game::OnStart() {
 		135, 25,
 		"assets/Oleaguid.ttf", "0", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
 
+	timeText.OnStart(
+		ScreenWidthF() - 40, 25,
+		"assets/Oleaguid.ttf", std::to_string(seconds).c_str(), 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
+
+	maxScoreText.OnStart(
+		ScreenWidthF() - 125, ScreenHeightF() - 38,
+		"assets/Oleaguid.ttf", "Max Score ", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
+
+	maxScoreNumberText.OnStart(
+		ScreenWidthF() - 35, ScreenHeightF() - 38,
+		"assets/Oleaguid.ttf", "0", 32, clf::Utilities::Color::PORTAFINO, 0, TTF_STYLE_NORMAL);
+
 	skeleton.OnStart(bg.GetDstW() / 2.0f, bg.GetDstH() / 2.0f);
 
 	spawner.OnStart();
@@ -38,6 +51,30 @@ void Game::OnUpdate(float deltaTime) {
 		oldScore = score;
 		scoreNumberText.SetText(std::to_string(oldScore).c_str());
 	}
+
+	//To count seconds
+	currentTime += deltaTime;
+
+	if (currentTime >= 1.0f) {
+		currentTime = 0.0f;
+		--seconds;
+		timeText.SetText(std::to_string(seconds).c_str());
+	}
+
+	if (seconds <= 0) {
+		if (score > maxScore) {
+			maxScore = score;
+			maxScoreNumberText.SetText(std::to_string(maxScore).c_str());
+		}
+
+		currentTime = 0.0f;
+		seconds = 60;
+		timeText.SetText(std::to_string(seconds).c_str());
+		score = 0;
+		oldScore = score;
+		scoreNumberText.SetText(std::to_string(oldScore).c_str());
+	}
+
 }
 
 void Game::OnRender() {
@@ -48,6 +85,9 @@ void Game::OnRender() {
 	message.Draw();
 	scoreText.Draw();
 	scoreNumberText.Draw();
+	timeText.Draw();
+	maxScoreText.Draw();
+	maxScoreNumberText.Draw();
 }
 
 void Game::OnFinish() {
@@ -57,4 +97,7 @@ void Game::OnFinish() {
 	scoreText.OnFinish();
 	spawner.OnFinish();
 	scoreNumberText.OnFinish();
+	timeText.OnFinish();
+	maxScoreText.OnFinish();
+	maxScoreNumberText.OnFinish();
 }
