@@ -1,12 +1,12 @@
 # CLab-Framework
-A SDL2 and C++ framework to work easily!
+A SDL2 and C++ framework to build experiments and games easily!
 
 ## Examples
 ### Snake
-![](SnakeExample.gif)
+![](gifs/SnakeExample.gif)
 
 ### Pong
-![](PongExample.gif)
+![](gifs/PongExample.gif)
 
 ### Rpg Movement
-![](RpgMechanicsExample.gif)
+![](gifs/RpgMechanicsExample.gif)
