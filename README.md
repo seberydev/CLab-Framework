@@ -1,2 +1,12 @@
 # CLab-Framework
-A Single Header File Framework made with SDL2 and C++ to work easily!
+A SDL2 and C++ framework to work easily!
+
+## Examples
+### Snake
+![](SnakeExample.gif)
+
+### Pong
+![](PongExample.gif)
+
+### Rpg Movement
+![](RpgMechanicsExample.gif)
