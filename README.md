@@ -1,4 +1,5 @@
 # CLab-Framework
+![](media/CLabLogo.png)  
 A SDL2 and C++ framework to build experiments and games easily!
 
 ## Dependencies
@@ -55,10 +56,10 @@ int main(int argc, char* args[]) {
 
 ## Examples
 ### Snake
-![](gifs/SnakeExample.gif)
+![](media/SnakeExample.gif)
 
 ### Pong
-![](gifs/PongExample.gif)
+![](media/PongExample.gif)
 
 ### Rpg Movement
-![](gifs/RpgMechanicsExample.gif)
+![](media/RpgMechanicsExample.gif)
